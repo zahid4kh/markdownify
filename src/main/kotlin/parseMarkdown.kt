@@ -110,38 +110,152 @@ fun parseTable(lines: List<String>, startIndex: Int, tokens: MutableList<Markdow
 
 fun parseInline(text: String): List<InlineToken> {
     val result = mutableListOf<InlineToken>()
-    val regex = Regex("""(\*\*.*?\*\*|\*.*?\*|`.*?`|\[.*?\]\(.*?\))""")
-    var currentIndex = 0
 
-    for (match in regex.findAll(text)) {
-        if (match.range.first > currentIndex) {
-            result += InlineToken.Text(text.substring(currentIndex, match.range.first))
-        }
+    parseInlineRecursive(text = text, result = result, insideBold = false, insideItalic = false, insideCode = false)
 
-        val matched = match.value
-        when {
-            matched.startsWith("**") && matched.endsWith("**") ->
-                result += InlineToken.Bold(matched.drop(2).dropLast(2))
-            matched.startsWith("*") && matched.endsWith("*") ->
-                result += InlineToken.Italic(matched.drop(1).dropLast(1))
-            matched.startsWith("`") && matched.endsWith("`") ->
-                result += InlineToken.Code(matched.drop(1).dropLast(1))
-            matched.startsWith("[") &&
-                    matched.contains("](") &&
-                    matched.endsWith(")") -> {
-                val closeBracket = matched.indexOf(']')
-                val text = matched.substring(1, closeBracket)
-                val url = matched.substring(closeBracket + 2, matched.length - 1)
-                result += InlineToken.Link(text, url)
+    return result
+}
+
+private fun parseInlineRecursive(
+    text: String,
+    result: MutableList<InlineToken>,
+    insideBold: Boolean = false,
+    insideItalic: Boolean = false,
+    insideCode: Boolean = false
+) {
+    var i = 0
+
+    while (i < text.length) {
+        // recursively checking for link patterns
+        if (text.startsWith("[", i) && !insideCode) {
+            val closeBracketIndex = text.indexOf(']', i + 1)
+
+            if (closeBracketIndex != -1 && text.startsWith("(", closeBracketIndex + 1)) {
+                val closeParenIndex = text.indexOf(')', closeBracketIndex + 1)
+
+                if (closeParenIndex != -1) {
+                    val linkText = text.substring(i + 1, closeBracketIndex)
+                    val linkUrl = text.substring(closeBracketIndex + 2, closeParenIndex)
+
+                    if (insideBold) {
+                        result.add(InlineToken.Link(
+                            text = linkText,
+                            url = linkUrl,
+                            bold = true,
+                            italic = insideItalic
+                        ))
+                    } else if (insideItalic) {
+                        result.add(InlineToken.Link(
+                            text = linkText,
+                            url = linkUrl,
+                            bold = false,
+                            italic = true
+                        ))
+                    } else {
+                        result.add(InlineToken.Link(
+                            text = linkText,
+                            url = linkUrl,
+                            bold = false,
+                            italic = false
+                        ))
+                    }
+
+                    i = closeParenIndex + 1
+                    continue
+                }
             }
         }
 
-        currentIndex = match.range.last + 1
-    }
+        // Checking for bold pattern
+        if (text.startsWith("**", i) && !insideCode && !insideBold) {
+            val closeBoldIndex = text.indexOf("**", i + 2)
 
-    if (currentIndex < text.length) {
-        result += InlineToken.Text(text.substring(currentIndex))
-    }
+            if (closeBoldIndex != -1) {
+                val boldContent = text.substring(i + 2, closeBoldIndex)
 
-    return result
+                // Checking for nested formatting inside bold
+                val nestedResult = mutableListOf<InlineToken>()
+                parseInlineRecursive(boldContent, nestedResult, true, insideItalic, false)
+
+                if (nestedResult.isEmpty()) {
+                    // Simple bold text
+                    result.add(InlineToken.Bold(boldContent))
+                } else {
+                    // Nested formatting inside bold
+                    nestedResult.forEach { token ->
+                        when (token) {
+                            is InlineToken.Text -> result.add(InlineToken.Bold(token.text))
+                            is InlineToken.Link -> result.add(InlineToken.Link(token.text, token.url, true, token.italic))
+                            is InlineToken.Italic -> result.add(InlineToken.Italic(token.text, true))
+                            is InlineToken.Code -> result.add(token) // Code inside bold remains code itself
+                            is InlineToken.Bold -> result.add(token)
+                        }
+                    }
+                }
+
+                i = closeBoldIndex + 2
+                continue
+            }
+        }
+
+        // Checking for italic pattern
+        if (text.startsWith("*", i) && !text.startsWith("**", i) && !insideCode && !insideItalic) {
+            val closeItalicIndex = text.indexOf("*", i + 1)
+
+            if (closeItalicIndex != -1) {
+                val italicContent = text.substring(i + 1, closeItalicIndex)
+
+                // Checking for nested formatting inside italic
+                val nestedResult = mutableListOf<InlineToken>()
+                parseInlineRecursive(italicContent, nestedResult, insideBold, true, false)
+
+                if (nestedResult.isEmpty()) {
+                    // simple italic text
+                    result.add(InlineToken.Italic(italicContent))
+                } else {
+                    // Nested formatting inside italic
+                    nestedResult.forEach { token ->
+                        when (token) {
+                            is InlineToken.Text -> result.add(InlineToken.Italic(token.text))
+                            is InlineToken.Link -> result.add(InlineToken.Link(token.text, token.url, token.bold, true))
+                            is InlineToken.Bold -> result.add(InlineToken.Bold(token.text, true))
+                            is InlineToken.Code -> result.add(token) // Code inside italic remains code
+                            is InlineToken.Italic -> result.add(token) // Shouldn't happen but keep it
+                        }
+                    }
+                }
+
+                i = closeItalicIndex + 1
+                continue
+            }
+        }
+
+        if (text.startsWith("`", i) && !insideCode) {
+            val closeCodeIndex = text.indexOf("`", i + 1)
+
+            if (closeCodeIndex != -1) {
+                val codeContent = text.substring(i + 1, closeCodeIndex)
+                result.add(InlineToken.Code(codeContent))
+                i = closeCodeIndex + 1
+                continue
+            }
+        }
+
+        var nextSpecialChar = text.length
+        for (marker in listOf("**", "*", "`", "[")) {
+            val index = text.indexOf(marker, i)
+            if (index != -1 && index < nextSpecialChar) {
+                nextSpecialChar = index
+            }
+        }
+
+        if (nextSpecialChar > i) {
+            val plainText = text.substring(i, nextSpecialChar)
+            result.add(InlineToken.Text(plainText))
+            i = nextSpecialChar
+        } else {
+            result.add(InlineToken.Text(text.substring(i)))
+            break
+        }
+    }
 }
