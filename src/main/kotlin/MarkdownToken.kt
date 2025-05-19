@@ -17,4 +17,5 @@ sealed class InlineToken {
     data class Bold(val text: String) : InlineToken()
     data class Italic(val text: String) : InlineToken()
     data class Code(val text: String) : InlineToken()
+    data class Link(val text: String, val url: String) : InlineToken()
 }
