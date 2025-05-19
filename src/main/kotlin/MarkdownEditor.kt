@@ -36,8 +36,8 @@ fun MarkdownEditor() {
                             // inserting closing backticks and language placeholder
                             val beforeCursor = newValue.text.substring(0, newValue.selection.start)
                             val afterCursor = newValue.text.substring(newValue.selection.start)
-                            val newText = "$beforeCursor\n\n`$afterCursor"
-                            val newPosition = beforeCursor.length // cursor after the newline
+                            val newText = "$beforeCursor\n`$afterCursor"
+                            val newPosition = beforeCursor.length // cursor stays in current line
 
                             textFieldValue = TextFieldValue(
                                 text = newText,
