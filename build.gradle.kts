@@ -56,7 +56,7 @@ compose.desktop {
 
             linux{
                 shortcut = true
-                iconFile.set(project.file("icons/compose.png"))
+                iconFile.set(project.file("icons/linuxos.png"))
             }
 
             windows{
@@ -64,12 +64,12 @@ compose.desktop {
                 dirChooser = true
                 menu = true
                 upgradeUuid = "run the 'generateUpgradeUuid' task and paste the generated UUID here only once"
-                iconFile.set(project.file("icons/compose.ico"))
+                iconFile.set(project.file("icons/windows.ico"))
             }
 
             macOS{
                 dockName = "markdown renderer"
-                iconFile.set(project.file("icons/compose.icns"))
+                iconFile.set(project.file("icons/macos.icns"))
             }
         }
     }
