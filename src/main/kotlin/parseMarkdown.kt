@@ -72,6 +72,14 @@ fun parseInline(text: String): List<InlineToken> {
                 result += InlineToken.Italic(matched.drop(1).dropLast(1))
             matched.startsWith("`") && matched.endsWith("`") ->
                 result += InlineToken.Code(matched.drop(1).dropLast(1))
+            matched.startsWith("[") &&
+                    matched.contains("](") &&
+                    matched.endsWith(")") -> {
+                val closeBracket = matched.indexOf(']')
+                val text = matched.substring(1, closeBracket)
+                val url = matched.substring(closeBracket + 2, matched.length - 1)
+                result += InlineToken.Link(text, url)
+            }
         }
 
         currentIndex = match.range.last + 1
