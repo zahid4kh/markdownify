@@ -87,7 +87,6 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
                                 fontFamily = FontFamily.Monospace,
                                 modifier = Modifier
                                     .padding(horizontal = 12.dp, vertical = 4.dp)
-                                    //.background(Color(0xFFE0E0E0))
                                     .padding(4.dp)
                             )
                         }
