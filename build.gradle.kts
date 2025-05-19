@@ -48,6 +48,11 @@ compose.desktop {
             packageName = "markdownrenderer"
             packageVersion = "1.0.0"
 
+            buildTypes.release.proguard{
+                obfuscate = true
+                optimize = true
+            }
+
             linux{
                 shortcut = true
                 iconFile.set(project.file("icons/compose.png"))
