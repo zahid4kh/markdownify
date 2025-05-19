@@ -22,29 +22,6 @@ fun main() = application {
         state = rememberWindowState(size = DpSize(800.dp, 600.dp)),
         title = "markdown renderer - Made with Compose for Desktop"
     ) {
-
-        MenuBar {
-            Menu("File") {
-                Item("Exit", onClick = ::exitApplication)
-                Item("Exit", onClick = ::exitApplication)
-                Item("Exit", onClick = ::exitApplication)
-                Item("Exit", onClick = ::exitApplication)
-            }
-
-            Menu("File") {
-                Item("Exit", onClick = ::exitApplication)
-                Item("Exit", onClick = ::exitApplication)
-                Item("Exit", onClick = ::exitApplication)
-                Item("Exit", onClick = ::exitApplication)
-            }
-
-            Menu("File") {
-                Item("Exit", onClick = ::exitApplication)
-                Item("Exit", onClick = ::exitApplication)
-                Item("Exit", onClick = ::exitApplication)
-                Item("Exit", onClick = ::exitApplication)
-            }
-        }
         window.minimumSize = Dimension(800, 600)
 
         AppTheme {
