@@ -1,21 +1,68 @@
 fun parseMarkdown(input: String): List<MarkdownToken> {
     val lines = input.lines()
     val tokens = mutableListOf<MarkdownToken>()
+    var i = 0
 
-    for (line in lines) {
+    while (i < lines.size) {
+        val line = lines[i]
         when {
-            line.startsWith("### ") -> tokens.add(MarkdownToken.Heading(3, line.drop(4)))
-            line.startsWith("## ") -> tokens.add(MarkdownToken.Heading(2, line.drop(3)))
-            line.startsWith("# ") -> tokens.add(MarkdownToken.Heading(1, line.drop(2)))
-            line.startsWith("- ") -> tokens.add(MarkdownToken.Bullet(parseInline(line.drop(2))))
-            line.startsWith("```") -> {
-                // multiline code block later
+            line.startsWith("### ") -> {
+                tokens.add(MarkdownToken.Heading(3, line.drop(4)))
+                i++
             }
-            line.startsWith("...") -> tokens.add(MarkdownToken.CodeBlock(line.drop(3).trim()))
-            else -> tokens.add(MarkdownToken.Paragraph(parseInline(line)))
+            line.startsWith("## ") -> {
+                tokens.add(MarkdownToken.Heading(2, line.drop(3)))
+                i++
+            }
+            line.startsWith("# ") -> {
+                tokens.add(MarkdownToken.Heading(1, line.drop(2)))
+                i++
+            }
+            line.startsWith("- ") -> {
+                tokens.add(MarkdownToken.Bullet(parseInline(line.drop(2))))
+                i++
+            }
+            line.startsWith("```") -> {
+                i = parseCodeBlock(lines, i, tokens)
+            }
+            line.startsWith("!!! ") -> {
+                tokens.add(MarkdownToken.Banner(BannerType.INFO, parseInline(line.drop(4))))
+                i++
+            }
+            line.startsWith("!!! warning ") -> {
+                tokens.add(MarkdownToken.Banner(BannerType.WARNING, parseInline(line.drop(12))))
+                i++
+            }
+            line.startsWith("!!! error ") -> {
+                tokens.add(MarkdownToken.Banner(BannerType.ERROR, parseInline(line.drop(10))))
+                i++
+            }
+            line.startsWith("!!! success ") -> {
+                tokens.add(MarkdownToken.Banner(BannerType.SUCCESS, parseInline(line.drop(12))))
+                i++
+            }
+            line.startsWith("![") -> {
+                val closeBracket = line.indexOf(']', 2)
+                if (closeBracket != -1 && line.getOrNull(closeBracket + 1) == '(' && line.indexOf(')', closeBracket) != -1) {
+                    val altText = line.substring(2, closeBracket)
+                    val urlStart = closeBracket + 2
+                    val urlEnd = line.indexOf(')', urlStart)
+                    val url = line.substring(urlStart, urlEnd)
+                    tokens.add(MarkdownToken.Image(altText, url))
+                } else {
+                    tokens.add(MarkdownToken.Paragraph(parseInline(line)))
+                }
+                i++
+            }
+            line.startsWith("|") && line.endsWith("|") -> {
+                i = parseTable(lines, i, tokens)
+            }
+            else -> {
+                tokens.add(MarkdownToken.Paragraph(parseInline(line)))
+                i++
+            }
         }
     }
-
     return tokens
 }
 
