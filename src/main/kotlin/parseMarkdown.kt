@@ -19,6 +19,24 @@ fun parseMarkdown(input: String): List<MarkdownToken> {
     return tokens
 }
 
+fun parseCodeBlock(lines: List<String>, startIndex: Int, tokens: MutableList<MarkdownToken>): Int {
+    val firstLine = lines[startIndex]
+    val language = firstLine.drop(3).trim()
+
+    val codeLines = mutableListOf<String>()
+    var i = startIndex + 1
+
+    while (i < lines.size && !lines[i].startsWith("```")) {
+        codeLines.add(lines[i])
+        i++
+    }
+
+    if (i < lines.size) i++ // Skiping the closing ```
+
+    tokens.add(MarkdownToken.CodeBlock(language, codeLines.joinToString("\n")))
+    return i
+}
+
 fun parseTable(lines: List<String>, startIndex: Int, tokens: MutableList<MarkdownToken>): Int {
     var i = startIndex
     val headers = lines[i].trim('|').split('|').map { it.trim() }
