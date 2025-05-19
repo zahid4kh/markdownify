@@ -37,7 +37,7 @@ fun MarkdownEditor() {
                             val beforeCursor = newValue.text.substring(0, newValue.selection.start)
                             val afterCursor = newValue.text.substring(newValue.selection.start)
                             val newText = "$beforeCursor\n\n`$afterCursor"
-                            val newPosition = beforeCursor.length + 1 // cursor after the newline
+                            val newPosition = beforeCursor.length // cursor after the newline
 
                             textFieldValue = TextFieldValue(
                                 text = newText,
