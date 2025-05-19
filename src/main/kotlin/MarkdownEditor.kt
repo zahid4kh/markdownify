@@ -1,9 +1,13 @@
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -64,14 +68,26 @@ fun MarkdownEditor() {
             modifier = Modifier
                 .weight(0.5f)
                 .fillMaxHeight(),
-            textStyle = TextStyle(fontFamily = FontFamily.Monospace)
+            textStyle = TextStyle(fontFamily = FontFamily.Monospace),
+            shape = RectangleShape,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.LightGray,
+                unfocusedContainerColor = Color.LightGray,
+            )
+        )
+
+        Box(
+            modifier = Modifier
+                .width(1.dp)
+                .fillMaxHeight()
+                .background(Color.Black)
         )
 
         Box(
             modifier = Modifier
                 .weight(0.5f)
                 .fillMaxHeight()
-                .padding(start = 8.dp)
+                //.padding(start = 8.dp)
         ) {
             Column(
                 modifier = Modifier
