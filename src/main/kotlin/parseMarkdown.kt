@@ -23,7 +23,14 @@ fun parseMarkdown(input: String): List<MarkdownToken> {
                 i++
             }
             line.startsWith("```") -> {
-                i = parseCodeBlock(lines, i, tokens)
+                // Only parsing as a code block if we can find a closing ```
+                val hasClosingBackticks = lines.subList(i + 1, lines.size).any { it.trim() == "```" }
+                if (hasClosingBackticks) {
+                    i = parseCodeBlock(lines, i, tokens)
+                } else {
+                    tokens.add(MarkdownToken.Paragraph(parseInline(line)))
+                    i++
+                }
             }
             line.startsWith("!!! ") -> {
                 tokens.add(MarkdownToken.Banner(BannerType.INFO, parseInline(line.drop(4))))
