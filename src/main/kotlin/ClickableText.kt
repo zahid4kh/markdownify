@@ -27,7 +27,13 @@ fun ClickableText(
                     val position = textLayoutResult.getOffsetForPosition(offset)
                     text.getStringAnnotations("URL", position, position).firstOrNull()?.let { annotation ->
                         try {
-                            Desktop.getDesktop().browse(URI(annotation.item))
+                            val url = if (!annotation.item.startsWith("http://") &&
+                                !annotation.item.startsWith("https://")) {
+                                "https://${annotation.item}"
+                            } else {
+                                annotation.item
+                            }
+                            Desktop.getDesktop().browse(URI(url))
                         } catch (e: Exception) {
                             println("Error opening URL: ${e.message}")
                         }
