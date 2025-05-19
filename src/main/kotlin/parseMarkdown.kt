@@ -56,7 +56,7 @@ fun parseTable(lines: List<String>, startIndex: Int, tokens: MutableList<Markdow
 
 fun parseInline(text: String): List<InlineToken> {
     val result = mutableListOf<InlineToken>()
-    val regex = Regex("""(\*\*.*?\*\*|\*.*?\*|`.*?`)""")
+    val regex = Regex("""(\*\*.*?\*\*|\*.*?\*|`.*?`|\[.*?\]\(.*?\))""")
     var currentIndex = 0
 
     for (match in regex.findAll(text)) {
