@@ -32,11 +32,11 @@ fun MarkdownEditor() {
                             newValue.selection.start
                         )
 
-                        if (previousTwoChars.endsWith("``")) {
+                        if (previousTwoChars.endsWith("```")) {
                             // inserting closing backticks and language placeholder
                             val beforeCursor = newValue.text.substring(0, newValue.selection.start)
                             val afterCursor = newValue.text.substring(newValue.selection.start)
-                            val newText = "$beforeCursor\n\n```$afterCursor"
+                            val newText = "$beforeCursor\n\n`$afterCursor"
                             val newPosition = beforeCursor.length + 1 // cursor after the newline
 
                             textFieldValue = TextFieldValue(
