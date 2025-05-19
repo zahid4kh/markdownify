@@ -5,6 +5,10 @@ sealed class MarkdownToken {
     data class CodeBlock(val text: String) : MarkdownToken()
 }
 
+enum class BannerType {
+    INFO, WARNING, ERROR, SUCCESS
+}
+
 sealed class InlineToken {
     data class Text(val text: String) : InlineToken()
     data class Bold(val text: String) : InlineToken()
