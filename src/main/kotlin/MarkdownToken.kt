@@ -14,8 +14,13 @@ enum class BannerType {
 
 sealed class InlineToken {
     data class Text(val text: String) : InlineToken()
-    data class Bold(val text: String) : InlineToken()
-    data class Italic(val text: String) : InlineToken()
+    data class Bold(val text: String, val italic: Boolean = false) : InlineToken()
+    data class Italic(val text: String, val bold: Boolean = false) : InlineToken()
     data class Code(val text: String) : InlineToken()
-    data class Link(val text: String, val url: String) : InlineToken()
+    data class Link(
+        val text: String,
+        val url: String,
+        val bold: Boolean = false,
+        val italic: Boolean = false
+    ) : InlineToken()
 }
