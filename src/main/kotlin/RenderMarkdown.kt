@@ -226,12 +226,34 @@ fun AnnotatedString.Builder.appendInlineTokens(tokens: List<InlineToken>) {
         when (token) {
             is InlineToken.Text -> append(token.text)
 
-            is InlineToken.Bold -> withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                append(token.text)
+            is InlineToken.Bold -> {
+                val style = if (token.italic) {
+                    SpanStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontStyle = FontStyle.Italic
+                    )
+                } else {
+                    SpanStyle(fontWeight = FontWeight.Bold)
+                }
+
+                withStyle(style) {
+                    append(token.text)
+                }
             }
 
-            is InlineToken.Italic -> withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
-                append(token.text)
+            is InlineToken.Italic -> {
+                val style = if (token.bold) {
+                    SpanStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontStyle = FontStyle.Italic
+                    )
+                } else {
+                    SpanStyle(fontStyle = FontStyle.Italic)
+                }
+
+                withStyle(style) {
+                    append(token.text)
+                }
             }
 
             is InlineToken.Code -> {
@@ -254,12 +276,15 @@ fun AnnotatedString.Builder.appendInlineTokens(tokens: List<InlineToken>) {
                     start = length,
                     end = length + token.text.length
                 )
-                withStyle(
-                    SpanStyle(
-                        color = Color.Blue,
-                        textDecoration = TextDecoration.Underline
-                    )
-                ) {
+
+                val spanStyle = SpanStyle(
+                    color = Color.Blue,
+                    textDecoration = TextDecoration.Underline,
+                    fontWeight = if (token.bold) FontWeight.Bold else FontWeight.Normal,
+                    fontStyle = if (token.italic) FontStyle.Italic else FontStyle.Normal
+                )
+
+                withStyle(spanStyle) {
                     append(token.text)
                 }
             }
