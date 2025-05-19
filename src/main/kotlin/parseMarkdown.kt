@@ -19,7 +19,22 @@ fun parseMarkdown(input: String): List<MarkdownToken> {
     return tokens
 }
 
-
+fun parseTable(lines: List<String>, startIndex: Int, tokens: MutableList<MarkdownToken>): Int {
+    var i = startIndex
+    val headers = lines[i].trim('|').split('|').map { it.trim() }
+    i++
+    if (i < lines.size && lines[i].matches(Regex("\\|[-:\\s|]*\\|"))) {
+        i++
+    }
+    val rows = mutableListOf<List<String>>()
+    while (i < lines.size && lines[i].startsWith("|") && lines[i].endsWith("|")) {
+        val row = lines[i].trim('|').split('|').map { it.trim() }
+        rows.add(row)
+        i++
+    }
+    tokens.add(MarkdownToken.Table(headers, rows))
+    return i
+}
 
 fun parseInline(text: String): List<InlineToken> {
     val result = mutableListOf<InlineToken>()
