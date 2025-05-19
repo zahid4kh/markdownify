@@ -67,7 +67,8 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
                 }
 
                 is MarkdownToken.CodeBlock -> {
-                    val bgColor = Color(0xFFF0F0F0)
+                    val bgColor = Color(0xFFF5F5F5)
+                    val borderColor = Color(0xFFDDDDDD)
                     val textColor = if (token.language.isNotEmpty()) Color(0xFF0000FF) else Color.Black
 
                     Column(
@@ -75,6 +76,7 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
                             .padding(vertical = 8.dp)
                             .clip(RoundedCornerShape(4.dp))
                             .background(bgColor)
+                            .border(1.dp, borderColor, RoundedCornerShape(4.dp))
                             .fillMaxWidth()
                     ) {
                         if (token.language.isNotEmpty()) {
@@ -85,6 +87,8 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
                                 fontFamily = FontFamily.Monospace,
                                 modifier = Modifier
                                     .padding(horizontal = 12.dp, vertical = 4.dp)
+                                    //.background(Color(0xFFE0E0E0))
+                                    .padding(4.dp)
                             )
                         }
 
@@ -92,7 +96,7 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
                             token.text,
                             fontFamily = FontFamily.Monospace,
                             color = Color.Black,
-                            modifier = Modifier.padding(12.dp)
+                            modifier = Modifier.padding(16.dp)
                         )
                     }
                 }
