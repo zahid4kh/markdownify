@@ -94,6 +94,7 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
                         Text(
                             token.text,
                             fontFamily = FontFamily.Monospace,
+                            fontSize = 14.sp,
                             color = Color.Black,
                             modifier = Modifier.padding(16.dp)
                         )
