@@ -16,7 +16,7 @@ fun MarkdownEditor() {
     var textFieldValue by remember {
         mutableStateOf(TextFieldValue(""))
     }
-    val tokens = remember(textFieldValue.text) { parseMarkdown(textFieldValue.text) }
+    val tokens = parseMarkdown(textFieldValue.text) // not using remember to avoid caching the links
     val scrollState = rememberScrollState()
 
     Row(modifier = Modifier.fillMaxSize()) {
@@ -78,7 +78,10 @@ fun MarkdownEditor() {
                     .fillMaxSize()
                     .verticalScroll(scrollState)
             ) {
-                RenderMarkdown(tokens)
+                // making sure rendering gets recomposed to refresh the text
+                key(textFieldValue.text) {
+                    RenderMarkdown(tokens)
+                }
             }
         }
     }
