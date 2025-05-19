@@ -235,7 +235,6 @@ fun AnnotatedString.Builder.appendInlineTokens(tokens: List<InlineToken>) {
             }
 
             is InlineToken.Code -> {
-                append(" ")
                 withStyle(
                     SpanStyle(
                         fontFamily = FontFamily.Monospace,
