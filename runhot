@@ -1,0 +1,7 @@
+#/bin/bash
+
+chmod +x gradlew
+
+clear && echo "running HOT..."
+
+./gradlew :runHot --mainClass "markdownrenderer" --auto
