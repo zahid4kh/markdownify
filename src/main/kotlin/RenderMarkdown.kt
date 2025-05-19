@@ -230,13 +230,18 @@ fun AnnotatedString.Builder.appendInlineTokens(tokens: List<InlineToken>) {
                 append(token.text)
             }
 
-            is InlineToken.Code -> withStyle(
-                SpanStyle(
-                    fontFamily = FontFamily.Monospace,
-                    background = Color(0xFFEFEFEF)
-                )
-            ) {
-                append(token.text)
+            is InlineToken.Code -> {
+                append(" ")
+                withStyle(
+                    SpanStyle(
+                        fontFamily = FontFamily.Monospace,
+                        background = Color(0xFFEFEFEF),
+                        letterSpacing = 0.5.sp
+                    )
+                ) {
+                    append(token.text)
+                }
+                append(" ")
             }
 
             is InlineToken.Link -> {
