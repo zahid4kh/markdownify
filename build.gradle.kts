@@ -22,6 +22,7 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
+    implementation(compose.components.resources)
     implementation(compose.material3)
     implementation(compose.materialIconsExtended)
 
@@ -88,4 +89,10 @@ tasks.register("generateUpgradeUuid") {
         println(UUID.randomUUID().toString())
         println("--------------------------------------------------")
     }
+}
+
+compose.resources{
+    publicResClass = false
+    packageOfResClass = "markdownify.resources"
+    generateResClass = auto
 }
