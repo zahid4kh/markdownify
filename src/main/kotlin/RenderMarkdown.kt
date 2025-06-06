@@ -6,14 +6,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -30,6 +33,9 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.decodeToImageBitmap
 import java.io.File
 import java.io.FileInputStream
+import coil3.ImageLoader
+import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -105,44 +111,113 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
                 }
 
                 is MarkdownToken.Image -> {
-                    val imageFile = File(token.url)
-                    if (imageFile.exists() && imageFile.isFile) {
-                        val imageBitmap = remember { mutableStateOf<ImageBitmap?>(null) }
+                    val isWebUrl = token.url.startsWith("http://") || token.url.startsWith("https://")
 
-                        LaunchedEffect(token.url) {
-                            withContext(Dispatchers.IO) {
-                                try {
-                                    FileInputStream(imageFile).use { stream ->
-                                        imageBitmap.value = stream.readAllBytes().decodeToImageBitmap()
+                    if (isWebUrl) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        ) {
+                            var isLoading by remember { mutableStateOf(true) }
+                            var hasError by remember { mutableStateOf(false) }
+
+                            val imageUrl = convertGitHubUrlToRaw(token.url)
+
+                            AsyncImage(
+                                model = imageUrl,
+                                contentDescription = token.altText,
+                                modifier = Modifier.padding(4.dp),
+                                onState = { state ->
+                                    when (state) {
+                                        is AsyncImagePainter.State.Loading -> {
+                                            isLoading = true
+                                            hasError = false
+                                        }
+                                        is AsyncImagePainter.State.Error -> {
+                                            isLoading = false
+                                            hasError = true
+                                            println("Error loading image from URL: $imageUrl")
+                                            println("Original URL: ${token.url}")
+                                            println("Error: ${state.result.throwable.message}")
+                                        }
+                                        is AsyncImagePainter.State.Success -> {
+                                            isLoading = false
+                                            hasError = false
+                                        }
+                                        else -> {}
                                     }
-                                } catch (e: Exception) {
-                                    println("Error loading image: ${e.message}")
-                                }
-                            }
-                        }
+                                },
+                                contentScale = ContentScale.Fit
+                            )
 
-                        imageBitmap.value?.let { bitmap ->
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            ) {
-                                Image(
-                                    painter = BitmapPainter(bitmap),
-                                    contentDescription = token.altText,
+                            when {
+                                isLoading -> Text(
+                                    "Loading image...",
+                                    fontSize = 12.sp,
+                                    color = Color.Gray,
                                     modifier = Modifier.padding(4.dp)
                                 )
-                                if (token.altText.isNotEmpty()) {
-                                    Text(
-                                        token.altText,
-                                        fontSize = 12.sp,
-                                        color = Color.Gray,
-                                        modifier = Modifier.padding(top = 4.dp)
-                                    )
-                                }
+                                hasError -> Text(
+                                    "Failed to load image: ${token.url}",
+                                    fontSize = 12.sp,
+                                    color = Color.Red,
+                                    modifier = Modifier.padding(4.dp)
+                                )
+                            }
+
+                            if (token.altText.isNotEmpty()) {
+                                Text(
+                                    token.altText,
+                                    fontSize = 12.sp,
+                                    color = Color.Gray,
+                                    modifier = Modifier.padding(top = 4.dp)
+                                )
                             }
                         }
                     } else {
-                        Text("Image not found: ${token.url}")
+                        val imageFile = File(token.url)
+                        if (imageFile.exists() && imageFile.isFile) {
+                            val imageBitmap = remember { mutableStateOf<ImageBitmap?>(null) }
+
+                            LaunchedEffect(token.url) {
+                                withContext(Dispatchers.IO) {
+                                    try {
+                                        FileInputStream(imageFile).use { stream ->
+                                            imageBitmap.value = stream.readAllBytes().decodeToImageBitmap()
+                                        }
+                                    } catch (e: Exception) {
+                                        println("Error loading image: ${e.message}")
+                                    }
+                                }
+                            }
+
+                            imageBitmap.value?.let { bitmap ->
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.padding(vertical = 8.dp)
+                                ) {
+                                    Image(
+                                        painter = BitmapPainter(bitmap),
+                                        contentDescription = token.altText,
+                                        modifier = Modifier.padding(4.dp)
+                                    )
+                                    if (token.altText.isNotEmpty()) {
+                                        Text(
+                                            token.altText,
+                                            fontSize = 12.sp,
+                                            color = Color.Gray,
+                                            modifier = Modifier.padding(top = 4.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        } else {
+                            Text(
+                                "Image not found: ${token.url}",
+                                color = Color.Red,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
                     }
                 }
 
