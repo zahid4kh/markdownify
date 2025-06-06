@@ -1,6 +1,7 @@
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -36,6 +37,8 @@ import java.io.FileInputStream
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
+import java.awt.Desktop
+import java.net.URI
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -294,6 +297,72 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
                         }
                     }
                 }
+
+                is MarkdownToken.ClickableImage -> {
+                    val imageUrl = convertGitHubUrlToRaw(token.imageUrl)
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    ) {
+                        var isLoading by remember { mutableStateOf(true) }
+                        var hasError by remember { mutableStateOf(false) }
+
+                        AsyncImage(
+                            model = imageUrl,
+                            contentDescription = token.altText,
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .clickable {
+                                    try {
+                                        Desktop.getDesktop().browse(URI(token.linkUrl))
+                                    } catch (e: Exception) {
+                                        println("Error opening URL: ${e.message}")
+                                    }
+                                },
+                            onState = { state ->
+                                when (state) {
+                                    is AsyncImagePainter.State.Loading -> {
+                                        isLoading = true
+                                        hasError = false
+                                    }
+                                    is AsyncImagePainter.State.Error -> {
+                                        isLoading = false
+                                        hasError = true
+                                        println("Error loading badge: ${state.result.throwable.message}")
+                                    }
+                                    is AsyncImagePainter.State.Success -> {
+                                        isLoading = false
+                                        hasError = false
+                                    }
+                                    else -> {}
+                                }
+                            },
+                            contentScale = ContentScale.Fit
+                        )
+
+                        when {
+                            isLoading -> Text(
+                                "Loading badge...",
+                                fontSize = 10.sp,
+                                color = Color.Gray
+                            )
+                            hasError -> Text(
+                                "[${token.altText}]",
+                                fontSize = 12.sp,
+                                color = Color.Blue,
+                                textDecoration = TextDecoration.Underline,
+                                modifier = Modifier.clickable {
+                                    try {
+                                        Desktop.getDesktop().browse(URI(token.linkUrl))
+                                    } catch (e: Exception) {
+                                        println("Error opening URL: ${e.message}")
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -371,6 +440,29 @@ fun AnnotatedString.Builder.appendInlineTokens(tokens: List<InlineToken>) {
 
                 withStyle(spanStyle) {
                     append(token.text)
+                }
+            }
+
+            is InlineToken.ClickableImage -> {
+                addStringAnnotation(
+                    tag = "URL",
+                    annotation = token.linkUrl,
+                    start = length,
+                    end = length + token.altText.length
+                )
+
+                val spanStyle = SpanStyle(
+                    color = Color.Blue,
+                    background = Color(0xFFE8F4FD),
+                    fontSize = 10.sp
+                )
+
+//                withStyle(spanStyle) {
+//                    append("[${token.altText}]")
+//                }
+
+                withStyle(spanStyle) {
+                    append("🏷️")
                 }
             }
         }

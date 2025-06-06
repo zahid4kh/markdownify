@@ -48,6 +48,25 @@ fun parseMarkdown(input: String): List<MarkdownToken> {
                 tokens.add(MarkdownToken.Banner(BannerType.SUCCESS, parseInline(line.drop(12))))
                 i++
             }
+            line.startsWith("[![") -> {
+                val imgCloseBracket = line.indexOf("](", 3)
+                if (imgCloseBracket != -1) {
+                    val imgCloseParen = line.indexOf(")", imgCloseBracket + 2)
+                    if (imgCloseParen != -1 && line.startsWith("](", imgCloseParen + 1)) {
+                        val linkCloseParen = line.indexOf(")", imgCloseParen + 3)
+                        if (linkCloseParen != -1) {
+                            val altText = line.substring(3, imgCloseBracket)
+                            val imageUrl = line.substring(imgCloseBracket + 2, imgCloseParen)
+                            val linkUrl = line.substring(imgCloseParen + 3, linkCloseParen)
+                            tokens.add(MarkdownToken.ClickableImage(altText, imageUrl, linkUrl))
+                            i++
+                            continue
+                        }
+                    }
+                }
+                tokens.add(MarkdownToken.Paragraph(parseInline(line)))
+                i++
+            }
             line.startsWith("![") -> {
                 val closeBracket = line.indexOf(']', 2)
                 if (closeBracket != -1 && line.getOrNull(closeBracket + 1) == '(' && line.indexOf(')', closeBracket) != -1) {
@@ -166,6 +185,25 @@ private fun parseInlineRecursive(
             }
         }
 
+        if (text.startsWith("[![", i) && !insideCode) {
+            val imgCloseBracket = text.indexOf("](", i + 3)
+            if (imgCloseBracket != -1) {
+                val imgCloseParen = text.indexOf(")", imgCloseBracket + 2)
+                if (imgCloseParen != -1 && text.startsWith("](", imgCloseParen + 1)) {
+                    val linkCloseParen = text.indexOf(")", imgCloseParen + 3)
+                    if (linkCloseParen != -1) {
+                        val altText = text.substring(i + 3, imgCloseBracket)
+                        val imageUrl = text.substring(imgCloseBracket + 2, imgCloseParen)
+                        val linkUrl = text.substring(imgCloseParen + 3, linkCloseParen)
+
+                        result.add(InlineToken.ClickableImage(altText, imageUrl, linkUrl))
+                        i = linkCloseParen + 1
+                        continue
+                    }
+                }
+            }
+        }
+
         // Checking for bold pattern
         if (text.startsWith("**", i) && !insideCode && !insideBold) {
             val closeBoldIndex = text.indexOf("**", i + 2)
@@ -189,6 +227,7 @@ private fun parseInlineRecursive(
                             is InlineToken.Italic -> result.add(InlineToken.Italic(token.text, true))
                             is InlineToken.Code -> result.add(token) // Code inside bold remains code itself
                             is InlineToken.Bold -> result.add(token)
+                            is InlineToken.ClickableImage -> {}
                         }
                     }
                 }
@@ -221,6 +260,7 @@ private fun parseInlineRecursive(
                             is InlineToken.Bold -> result.add(InlineToken.Bold(token.text, true))
                             is InlineToken.Code -> result.add(token) // Code inside italic remains code
                             is InlineToken.Italic -> result.add(token) // Shouldn't happen but keep it
+                            is InlineToken.ClickableImage -> {}
                         }
                     }
                 }

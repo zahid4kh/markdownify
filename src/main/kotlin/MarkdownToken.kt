@@ -6,6 +6,7 @@ sealed class MarkdownToken {
     data class Image(val altText: String, val url: String) : MarkdownToken()
     data class Banner(val type: BannerType, val inlines: List<InlineToken>) : MarkdownToken()
     data class Table(val headers: List<String>, val rows: List<List<String>>) : MarkdownToken()
+    data class ClickableImage(val altText: String, val imageUrl: String, val linkUrl: String) : MarkdownToken()
 }
 
 enum class BannerType {
@@ -17,6 +18,7 @@ sealed class InlineToken {
     data class Bold(val text: String, val italic: Boolean = false) : InlineToken()
     data class Italic(val text: String, val bold: Boolean = false) : InlineToken()
     data class Code(val text: String) : InlineToken()
+    data class ClickableImage(val altText: String, val imageUrl: String, val linkUrl: String) : InlineToken()
     data class Link(
         val text: String,
         val url: String,
