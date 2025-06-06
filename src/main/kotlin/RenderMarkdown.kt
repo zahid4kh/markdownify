@@ -223,7 +223,14 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
         }
     }
 }
-
+private fun convertGitHubUrlToRaw(url: String): String {
+    return if (url.contains("github.com") && url.contains("/blob/")) {
+        url.replace("github.com", "raw.githubusercontent.com")
+            .replace("/blob/", "/")
+    } else {
+        url
+    }
+}
 fun AnnotatedString.Builder.appendInlineTokens(tokens: List<InlineToken>) {
     for (token in tokens) {
         when (token) {
