@@ -5,6 +5,7 @@ kotlinxCoroutines = "1.10.2"
 kotlinxSerializationJson = "1.8.1"
 koin = "4.0.3"
 hotReload = "1.0.0-alpha10"
+deskit = "1.2.0"
 
 [libraries]
 # Kotlinx
@@ -14,6 +15,9 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 
 # Koin
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+
+deskit = { group = "com.github.zahid4kh", name = "deskit", version.ref = "deskit" }
+
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
