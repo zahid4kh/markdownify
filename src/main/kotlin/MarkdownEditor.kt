@@ -71,32 +71,49 @@ fun MarkdownEditor() {
                 .weight(0.5f)
                 .fillMaxHeight()
                 .onPreviewKeyEvent { event ->
-                    if (event.type == KeyEventType.KeyDown && event.key == Key.Enter) {
-                        val text = textFieldValue.text
-                        val cursorPos = textFieldValue.selection.start
+                    if (event.type == KeyEventType.KeyDown) {
+                        when (event.key) {
+                            Key.Enter -> {
+                                val text = textFieldValue.text
+                                val cursorPos = textFieldValue.selection.start
 
-                        val lineStart = text.lastIndexOf('\n', cursorPos - 1) + 1
-                        val currentLine = text.substring(lineStart, cursorPos)
+                                val lineStart = text.lastIndexOf('\n', cursorPos - 1) + 1
+                                val currentLine = text.substring(lineStart, cursorPos)
 
-                        val trimmedLine = currentLine.trimStart()
-                        val leadingSpaces = currentLine.length - trimmedLine.length
+                                val trimmedLine = currentLine.trimStart()
+                                val leadingSpaces = currentLine.length - trimmedLine.length
 
-                        if (trimmedLine.startsWith("- ") || trimmedLine.startsWith("* ")) {
-                            val bulletChar = if (trimmedLine.startsWith("- ")) "-" else "*"
-                            val beforeCursor = text.substring(0, cursorPos)
-                            val afterCursor = text.substring(cursorPos)
+                                if (trimmedLine.startsWith("- ") || trimmedLine.startsWith("* ")) {
+                                    val bulletChar = if (trimmedLine.startsWith("- ")) "-" else "*"
+                                    val beforeCursor = text.substring(0, cursorPos)
+                                    val afterCursor = text.substring(cursorPos)
 
-                            val indentation = " ".repeat(leadingSpaces)
-                            val newText = "$beforeCursor\n$indentation$bulletChar $afterCursor"
-                            val newPosition = cursorPos + 1 + leadingSpaces + 2
+                                    val indentation = " ".repeat(leadingSpaces)
+                                    val newText = "$beforeCursor\n$indentation$bulletChar $afterCursor"
+                                    val newPosition = cursorPos + 1 + leadingSpaces + 2
 
-                            textFieldValue = TextFieldValue(
-                                text = newText,
-                                selection = TextRange(newPosition)
-                            )
-                            true
-                        } else {
-                            false
+                                    textFieldValue = TextFieldValue(
+                                        text = newText,
+                                        selection = TextRange(newPosition)
+                                    )
+                                    true
+                                } else {
+                                    false
+                                }
+                            }
+                            Key.Tab -> {
+                                val beforeCursor = textFieldValue.text.substring(0, textFieldValue.selection.start)
+                                val afterCursor = textFieldValue.text.substring(textFieldValue.selection.end)
+                                val newText = "$beforeCursor  $afterCursor"
+                                val newPosition = textFieldValue.selection.start + 2
+
+                                textFieldValue = TextFieldValue(
+                                    text = newText,
+                                    selection = TextRange(newPosition)
+                                )
+                                true
+                            }
+                            else -> false
                         }
                     } else {
                         false
