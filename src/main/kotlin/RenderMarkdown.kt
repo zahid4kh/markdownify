@@ -75,7 +75,10 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
                     }
                     ClickableText(
                         text = annotatedString,
-                        modifier = Modifier.padding(vertical = 2.dp, horizontal = 8.dp)
+                        modifier = Modifier.padding(
+                            vertical = 2.dp,
+                            horizontal = (8 + token.level * 16).dp
+                        )
                     )
                 }
 
