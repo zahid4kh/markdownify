@@ -5,7 +5,7 @@ sealed class MarkdownToken {
     data class CodeBlock(val language: String, val text: String) : MarkdownToken()
     data class Image(val altText: String, val url: String) : MarkdownToken()
     data class Banner(val type: BannerType, val inlines: List<InlineToken>) : MarkdownToken()
-    data class Table(val headers: List<String>, val rows: List<List<String>>) : MarkdownToken()
+    data class Table(val headers: List<List<InlineToken>>, val rows: List<List<List<InlineToken>>>) : MarkdownToken()
     data class ClickableImage(val altText: String, val imageUrl: String, val linkUrl: String) : MarkdownToken()
 }
 

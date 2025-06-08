@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -259,10 +260,8 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
                                 .fillMaxWidth()
                                 .background(Color(0xFFEEEEEE))
                         ) {
-                            token.headers.forEach { header ->
-                                Text(
-                                    header,
-                                    fontWeight = FontWeight.Bold,
+                            token.headers.forEach { headerInlines ->
+                                Box(
                                     modifier = Modifier
                                         .weight(1f)
                                         .padding(8.dp)
@@ -271,16 +270,23 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
                                             color = Color.LightGray
                                         )
                                         .padding(4.dp)
-                                )
+                                ) {
+                                    val annotatedString = buildAnnotatedString {
+                                        appendInlineTokens(headerInlines)
+                                    }
+                                    ClickableText(
+                                        text = annotatedString,
+                                        style = TextStyle(fontWeight = FontWeight.Bold)
+                                    )
+                                }
                             }
                         }
 
                         // Data rows
                         token.rows.forEach { row ->
                             Row(modifier = Modifier.fillMaxWidth()) {
-                                row.forEach { cell ->
-                                    Text(
-                                        cell,
+                                row.forEach { cellInlines ->
+                                    Box(
                                         modifier = Modifier
                                             .weight(1f)
                                             .padding(8.dp)
@@ -289,7 +295,12 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
                                                 color = Color.LightGray
                                             )
                                             .padding(4.dp)
-                                    )
+                                    ) {
+                                        val annotatedString = buildAnnotatedString {
+                                            appendInlineTokens(cellInlines)
+                                        }
+                                        ClickableText(text = annotatedString)
+                                    }
                                 }
                             }
                         }

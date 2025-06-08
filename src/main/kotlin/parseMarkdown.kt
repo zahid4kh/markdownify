@@ -136,14 +136,16 @@ fun parseCodeBlock(lines: List<String>, startIndex: Int, tokens: MutableList<Mar
 
 fun parseTable(lines: List<String>, startIndex: Int, tokens: MutableList<MarkdownToken>): Int {
     var i = startIndex
-    val headers = lines[i].trim('|').split('|').map { it.trim() }
+    val headerLine = lines[i].trim('|').split('|').map { it.trim() }
+    val headers = headerLine.map { parseInline(it) }
     i++
     if (i < lines.size && lines[i].matches(Regex("\\|[-:\\s|]*\\|"))) {
         i++
     }
-    val rows = mutableListOf<List<String>>()
+    val rows = mutableListOf<List<List<InlineToken>>>()
     while (i < lines.size && lines[i].startsWith("|") && lines[i].endsWith("|")) {
-        val row = lines[i].trim('|').split('|').map { it.trim() }
+        val rowLine = lines[i].trim('|').split('|').map { it.trim() }
+        val row = rowLine.map { parseInline(it) }
         rows.add(row)
         i++
     }
