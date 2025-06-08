@@ -10,7 +10,7 @@ sealed class MarkdownToken {
 }
 
 enum class BannerType {
-    INFO, WARNING, ERROR, SUCCESS
+    INFO, WARNING, ERROR, SUCCESS, NOTE
 }
 
 sealed class InlineToken {

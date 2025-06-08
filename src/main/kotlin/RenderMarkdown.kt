@@ -229,6 +229,7 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
                         BannerType.WARNING -> Color(0xFFFFF8E1) to Color(0xFFFFC107)
                         BannerType.ERROR -> Color(0xFFFFEBEE) to Color(0xFFF44336)
                         BannerType.SUCCESS -> Color(0xFFE8F5E9) to Color(0xFF4CAF50)
+                        BannerType.NOTE -> Color(0xFFF5F5F5) to Color(0xFF9E9E9E)
                     }
 
                     Box(

@@ -52,6 +52,14 @@ fun parseMarkdown(input: String): List<MarkdownToken> {
                 tokens.add(MarkdownToken.Banner(BannerType.SUCCESS, parseInline(line.drop(12))))
                 i++
             }
+            line.startsWith("> Note:") -> {
+                tokens.add(MarkdownToken.Banner(BannerType.NOTE, parseInline(line.drop(2))))
+                i++
+            }
+            line.startsWith("!!! note ") -> {
+                tokens.add(MarkdownToken.Banner(BannerType.NOTE, parseInline(line.drop(9))))
+                i++
+            }
             line.startsWith("[![") -> {
                 val imgCloseBracket = line.indexOf("](", 3)
                 if (imgCloseBracket != -1) {
