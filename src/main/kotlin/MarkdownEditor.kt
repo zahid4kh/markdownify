@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -68,7 +69,39 @@ fun MarkdownEditor() {
             },
             modifier = Modifier
                 .weight(0.5f)
-                .fillMaxHeight(),
+                .fillMaxHeight()
+                .onPreviewKeyEvent { event ->
+                    if (event.type == KeyEventType.KeyDown && event.key == Key.Enter) {
+                        val text = textFieldValue.text
+                        val cursorPos = textFieldValue.selection.start
+
+                        val lineStart = text.lastIndexOf('\n', cursorPos - 1) + 1
+                        val currentLine = text.substring(lineStart, cursorPos)
+
+                        val trimmedLine = currentLine.trimStart()
+                        val leadingSpaces = currentLine.length - trimmedLine.length
+
+                        if (trimmedLine.startsWith("- ") || trimmedLine.startsWith("* ")) {
+                            val bulletChar = if (trimmedLine.startsWith("- ")) "-" else "*"
+                            val beforeCursor = text.substring(0, cursorPos)
+                            val afterCursor = text.substring(cursorPos)
+
+                            val indentation = " ".repeat(leadingSpaces)
+                            val newText = "$beforeCursor\n$indentation$bulletChar $afterCursor"
+                            val newPosition = cursorPos + 1 + leadingSpaces + 2
+
+                            textFieldValue = TextFieldValue(
+                                text = newText,
+                                selection = TextRange(newPosition)
+                            )
+                            true
+                        } else {
+                            false
+                        }
+                    } else {
+                        false
+                    }
+                },
             textStyle = TextStyle(fontFamily = FontFamily.Monospace),
             shape = RectangleShape,
             colors = TextFieldDefaults.colors(
