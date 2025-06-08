@@ -6,6 +6,10 @@ fun parseMarkdown(input: String): List<MarkdownToken> {
     while (i < lines.size) {
         val line = lines[i]
         when {
+            line.startsWith("#### ") -> {
+                tokens.add(MarkdownToken.Heading(4, line.drop(5)))
+                i++
+            }
             line.startsWith("### ") -> {
                 tokens.add(MarkdownToken.Heading(3, line.drop(4)))
                 i++

@@ -49,8 +49,9 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
                 is MarkdownToken.Heading -> Text(
                     token.text,
                     fontSize = when (token.level) {
-                        1 -> 24.sp
-                        2 -> 20.sp
+                        1 -> 26.sp
+                        2 -> 22.sp
+                        3 -> 19.sp
                         else -> 18.sp
                     },
                     fontWeight = FontWeight.Bold,
