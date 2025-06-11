@@ -41,6 +41,9 @@ dependencies {
     implementation(libs.coil.core)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+
+    implementation("org.slf4j:slf4j-api:2.0.12")
+    implementation("org.slf4j:slf4j-simple:2.0.12")
 }
 
 
