@@ -15,7 +15,13 @@ import androidx.compose.ui.unit.*
 
 @Preview
 @Composable
-fun MenuBar(){
+fun MenuBar(
+    onNewFile: () -> Unit = {},
+    onOpenFile: () -> Unit = {},
+    onSaveFile: () -> Unit = {},
+    onToggleDarkMode: () -> Unit = {},
+    onShowInfo: () -> Unit = {}
+){
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -26,23 +32,38 @@ fun MenuBar(){
         MenuBarItem(
             itemTitle = FileMenuItem.FILE,
             itemTitleIcon = Icons.Default.MoreHoriz,
-            children = listOf(FileMenuItem.NEW_FILE, FileMenuItem.OPEN_FILE)
+            children = listOf(FileMenuItem.NEW_FILE, FileMenuItem.OPEN_FILE, FileMenuItem.SAVE_FILE),
+            onItemClick = { item ->
+                when (item) {
+                    FileMenuItem.NEW_FILE -> onNewFile()
+                    FileMenuItem.OPEN_FILE -> onOpenFile()
+                    FileMenuItem.SAVE_FILE -> onSaveFile()
+                    else -> {}
+                }
+            }
         )
         Spacer(modifier = Modifier.width(5.dp))
         MenuBarItem(
             itemTitle = FileMenuItem.OPTIONS,
             itemTitleIcon = Icons.Default.Settings,
-            children = listOf(FileMenuItem.DARK_MODE, FileMenuItem.LIGHT_MODE, FileMenuItem.INFO)
+            children = listOf(FileMenuItem.DARK_MODE, FileMenuItem.INFO),
+            onItemClick = { item ->
+                when (item) {
+                    FileMenuItem.DARK_MODE -> onToggleDarkMode()
+                    FileMenuItem.INFO -> onShowInfo()
+                    else -> {}
+                }
+            }
         )
     }
 }
-
 
 @Composable
 fun MenuBarItem(
     itemTitle: FileMenuItem,
     itemTitleIcon: ImageVector? = null,
     children: List<FileMenuItem>,
+    onItemClick: (FileMenuItem) -> Unit = {}
 ){
     var expanded by remember { mutableStateOf(false) }
 
@@ -86,6 +107,7 @@ fun MenuBarItem(
                     },
                     onClick = {
                         expanded = false
+                        onItemClick(childItem)
                     },
                     modifier = Modifier.pointerHoverIcon(icon = PointerIcon.Hand)
                 )
@@ -98,8 +120,8 @@ enum class FileMenuItem(val title: String) {
     FILE("File"),
     NEW_FILE("New file"),
     OPEN_FILE("Open existing"),
+    SAVE_FILE("Save"),
     OPTIONS("Options"),
-    DARK_MODE("Dark mode"),
-    LIGHT_MODE("Light mode"),
+    DARK_MODE("Toggle theme"),
     INFO("Info")
 }
