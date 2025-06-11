@@ -11,8 +11,6 @@ data class AppSettings(
 data class WindowState(
     val width: Int = 800,
     val height: Int = 600,
-    val positionX: Int = -1,
-    val positionY: Int = -1
 )
 
 data class OpenFile(
