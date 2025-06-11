@@ -21,7 +21,7 @@ fun main() {
         val uiState by viewModel.uiState.collectAsState()
 
     val windowState = rememberWindowState(
-        size = DpSize(uiState.windowState.width.dp, uiState.windowState.height.dp)
+        size = DpSize(800.dp, 600.dp)
     )
 
         Window(
