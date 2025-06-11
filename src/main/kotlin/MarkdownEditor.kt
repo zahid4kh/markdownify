@@ -99,7 +99,6 @@ fun MarkdownEditor(
                                     selection = TextRange(newPosition)
                                 )
                             } else {
-                                // inserting closing backtick
                                 val beforeCursor = newValue.text.substring(0, newValue.selection.start)
                                 val afterCursor = newValue.text.substring(newValue.selection.start)
                                 val newText = "$beforeCursor`$afterCursor"
