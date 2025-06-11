@@ -1,5 +1,4 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -76,6 +75,9 @@ fun MarkdownEditor(
             TextField(
                 value = textFieldValue,
                 onValueChange = { newValue ->
+                    textFieldValue = newValue
+                    viewModel.updateFileContent(newValue.text)
+
                     if (newValue.text.length > textFieldValue.text.length) {
                         val addedChar = newValue.text.getOrNull(newValue.selection.start - 1)
 
@@ -143,6 +145,7 @@ fun MarkdownEditor(
                                             text = newText,
                                             selection = TextRange(newPosition)
                                         )
+                                        viewModel.updateFileContent(newText)
                                         true
                                     } else {
                                         false
@@ -158,6 +161,7 @@ fun MarkdownEditor(
                                         text = newText,
                                         selection = TextRange(newPosition)
                                     )
+                                    viewModel.updateFileContent(newText)
                                     true
                                 }
                                 else -> false

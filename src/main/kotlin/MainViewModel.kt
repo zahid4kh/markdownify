@@ -19,8 +19,7 @@ class MainViewModel(
         scope.launch {
             val settings = database.getSettings()
             _uiState.value = _uiState.value.copy(
-                darkMode = settings.darkMode,
-                windowState = settings.windowState
+                darkMode = settings.darkMode
             )
         }
         createNewFile()
@@ -31,7 +30,8 @@ class MainViewModel(
         val newFile = OpenFile(
             file = null,
             content = "",
-            title = "Untitled${if (currentFiles.isEmpty()) "" else " ${currentFiles.size + 1}"}"
+            title = "Untitled${if (currentFiles.isEmpty()) "" else " ${currentFiles.size + 1}"}" ,
+            originalContent = ""
         )
         _uiState.value = _uiState.value.copy(
             openFiles = currentFiles + newFile,
@@ -52,7 +52,8 @@ class MainViewModel(
                     val newFile = OpenFile(
                         file = file,
                         content = content,
-                        title = file.nameWithoutExtension
+                        title = file.nameWithoutExtension,
+                        originalContent = content
                     )
                     _uiState.value = _uiState.value.copy(
                         openFiles = currentFiles + newFile,
@@ -80,7 +81,8 @@ class MainViewModel(
                     val updatedFile = activeFile.copy(
                         file = targetFile,
                         isModified = false,
-                        title = targetFile.nameWithoutExtension
+                        title = targetFile.nameWithoutExtension,
+                        originalContent = activeFile.content
                     )
                     updateFile(currentState.activeFileIndex, updatedFile)
                 } catch (e: Exception) {
@@ -96,9 +98,7 @@ class MainViewModel(
 
         val updatedFile = activeFile.copy(
             content = content,
-            isModified = content != (activeFile.file?.let {
-                try { it.readText() } catch (e: Exception) { "" }
-            } ?: "")
+            isModified = content != activeFile.originalContent
         )
         updateFile(currentState.activeFileIndex, updatedFile)
     }
@@ -118,7 +118,7 @@ class MainViewModel(
     fun closeFile(index: Int) {
         val currentFiles = _uiState.value.openFiles.toMutableList()
         if (currentFiles.size <= 1) {
-            currentFiles[0] = OpenFile(file = null, content = "", title = "Untitled")
+            currentFiles[0] = OpenFile(file = null, content = "", title = "Untitled", originalContent = "")
             _uiState.value = _uiState.value.copy(openFiles = currentFiles, activeFileIndex = 0)
         } else {
             currentFiles.removeAt(index)
@@ -172,7 +172,6 @@ class MainViewModel(
         val darkMode: Boolean = false,
         val openFiles: List<OpenFile> = emptyList(),
         val activeFileIndex: Int = 0,
-        val windowState: WindowState = WindowState(),
         val showFileChooser: Boolean = false,
         val showFileSaver: Boolean = false,
         val showInfo: Boolean = false
