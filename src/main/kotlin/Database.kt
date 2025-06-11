@@ -20,18 +20,20 @@ class Database {
 
         settingsFile = File(appDir, "settings.json")
 
-        if (!settingsFile.exists()) settingsFile.writeText(json.encodeToString(AppSettings()))
+        if (!settingsFile.exists()) {
+            settingsFile.writeText(json.encodeToString(AppSettings.serializer(), AppSettings()))
+        }
     }
 
     suspend fun getSettings(): AppSettings = withContext(Dispatchers.IO) {
         return@withContext try {
-            json.decodeFromString(settingsFile.readText())
+            json.decodeFromString(AppSettings.serializer(), settingsFile.readText())
         } catch (e: Exception) {
             AppSettings()
         }
     }
 
     suspend fun saveSettings(settings: AppSettings) = withContext(Dispatchers.IO) {
-        settingsFile.writeText(json.encodeToString(settings))
+        settingsFile.writeText(json.encodeToString(AppSettings.serializer(), settings))
     }
 }
