@@ -12,7 +12,7 @@ fun App(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     AppTheme(darkTheme = uiState.darkMode) {
-        MarkdownEditor()
+        MarkdownEditor(viewModel)
     }
 }
 
