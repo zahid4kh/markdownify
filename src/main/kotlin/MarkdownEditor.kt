@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -16,18 +18,59 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import dialogs.InfoDialog
+import dialogs.file.FileChooserDialog
+import dialogs.file.FileSaverDialog
 
 @Preview
 @Composable
-fun MarkdownEditor() {
+fun MarkdownEditor(
+    viewModel: MainViewModel
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val activeFile = uiState.activeFile
+
     var textFieldValue by remember {
         mutableStateOf(TextFieldValue(""))
     }
     val tokens = parseMarkdown(textFieldValue.text) // not using remember to avoid caching the links
     val scrollState = rememberScrollState()
 
+    LaunchedEffect(activeFile) {
+        if (activeFile != null) {
+            textFieldValue = TextFieldValue(activeFile.content)
+        }
+    }
+
+
     Column{
-        MenuBar()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            MenuBar(
+                onNewFile = { viewModel.createNewFile() },
+                onOpenFile = { viewModel.showFileChooser() },
+                onSaveFile = {
+                    if (activeFile?.file != null) {
+                        viewModel.saveFile()
+                    } else {
+                        viewModel.showFileSaver()
+                    }
+                },
+                onToggleDarkMode = { viewModel.toggleDarkMode() },
+                onShowInfo = { viewModel.showInfo() }
+            )
+
+            Spacer(Modifier.width(16.dp))
+
+            TabDropdown(
+                openFiles = uiState.openFiles,
+                activeFileIndex = uiState.activeFileIndex,
+                onTabSelected = { viewModel.switchToFile(it) },
+                onTabClosed = { viewModel.closeFile(it) }
+            )
+        }
 
         Row(modifier = Modifier.fillMaxSize()) {
             TextField(
@@ -157,5 +200,50 @@ fun MarkdownEditor() {
             }
         }
 
+    }
+
+    if (uiState.showFileChooser) {
+        FileChooserDialog(
+            title = "Open Markdown File",
+            allowedExtensions = listOf("md", "markdown", "txt"),
+            onFileSelected = { file ->
+                viewModel.openFile(file)
+                viewModel.hideFileChooser()
+            },
+            onCancel = { viewModel.hideFileChooser() }
+        )
+    }
+
+    if (uiState.showFileSaver) {
+        FileSaverDialog(
+            title = "Save Markdown File",
+            suggestedFileName = activeFile?.title ?: "untitled",
+            extension = ".md",
+            onSave = { file ->
+                viewModel.saveFile(file)
+                viewModel.hideFileSaver()
+            },
+            onCancel = { viewModel.hideFileSaver() }
+        )
+    }
+
+    if (uiState.showInfo) {
+        InfoDialog(
+            title = "Markdown Renderer",
+            content = {
+                Column {
+                    Text("Markdown Renderer v1.0.0")
+                    Spacer(Modifier.height(8.dp))
+                    Text("A powerful markdown editor built with Compose for Desktop")
+                    Spacer(Modifier.height(8.dp))
+                    Text("Features:")
+                    Text("• Live markdown preview")
+                    Text("• Multiple file tabs")
+                    Text("• Dark/Light theme")
+                    Text("• File operations")
+                }
+            },
+            onClose = { viewModel.hideInfo() }
+        )
     }
 }
