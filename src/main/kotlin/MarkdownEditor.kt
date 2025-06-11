@@ -35,7 +35,7 @@ fun MarkdownEditor(
     val tokens = parseMarkdown(textFieldValue.text) // not using remember to avoid caching the links
     val scrollState = rememberScrollState()
 
-    LaunchedEffect(activeFile) {
+    LaunchedEffect(uiState.activeFileIndex) {
         if (activeFile != null) {
             textFieldValue = TextFieldValue(activeFile.content)
         }
@@ -75,9 +75,6 @@ fun MarkdownEditor(
             TextField(
                 value = textFieldValue,
                 onValueChange = { newValue ->
-                    textFieldValue = newValue
-                    viewModel.updateFileContent(newValue.text)
-
                     if (newValue.text.length > textFieldValue.text.length) {
                         val addedChar = newValue.text.getOrNull(newValue.selection.start - 1)
 
@@ -97,6 +94,7 @@ fun MarkdownEditor(
                                     text = newText,
                                     selection = TextRange(newPosition)
                                 )
+                                viewModel.updateFileContent(newText)
                             } else {
                                 val beforeCursor = newValue.text.substring(0, newValue.selection.start)
                                 val afterCursor = newValue.text.substring(newValue.selection.start)
@@ -109,9 +107,11 @@ fun MarkdownEditor(
                             }
                         } else {
                             textFieldValue = newValue
+                            viewModel.updateFileContent(newValue.text)
                         }
                     } else {
                         textFieldValue = newValue
+                        viewModel.updateFileContent(newValue.text)
                     }
                 },
                 modifier = Modifier
