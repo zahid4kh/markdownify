@@ -17,7 +17,8 @@ data class OpenFile(
     val file: File?,
     val content: String,
     val isModified: Boolean = false,
-    val title: String = "Untitled"
+    val title: String = "Untitled",
+    val originalContent: String = ""
 ) {
     val displayTitle: String
         get() = if (isModified) "$title*" else title
