@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.*
 
 
 @Composable
-private fun TabDropdown(
+fun TabDropdown(
     openFiles: List<OpenFile>,
     activeFileIndex: Int,
     onTabSelected: (Int) -> Unit,
