@@ -11,28 +11,29 @@ import org.koin.java.KoinJavaComponent.getKoin
 import theme.AppTheme
 import java.awt.Dimension
 
-fun main() = application {
+fun main() {
     startKoin {
         modules(appModule)
     }
 
-    val viewModel = getKoin().get<MainViewModel>()
-    val uiState by viewModel.uiState.collectAsState()
+    application {
+        val viewModel = getKoin().get<MainViewModel>()
+        val uiState by viewModel.uiState.collectAsState()
 
     val windowState = rememberWindowState(
         size = DpSize(uiState.windowState.width.dp, uiState.windowState.height.dp)
     )
 
-    Window(
-        onCloseRequest = ::exitApplication,
-        state = windowState,
-        alwaysOnTop = true,
-        title = "Markdown Renderer - ${uiState.activeFile?.displayTitle ?: "No file"}"
-    ) {
-        window.minimumSize = Dimension(800, 600)
+        Window(
+            onCloseRequest = ::exitApplication,
+            state = windowState,
+            title = "Markdown Renderer - ${uiState.activeFile?.displayTitle ?: "No file"}"
+        ) {
+            window.minimumSize = Dimension(800, 600)
 
-        AppTheme(darkTheme = uiState.darkMode) {
-            App(viewModel = viewModel)
+            AppTheme(darkTheme = uiState.darkMode) {
+                App(viewModel = viewModel)
+            }
         }
     }
 }
