@@ -88,7 +88,6 @@ fun MarkdownEditor(
                             )
 
                             if (previousTwoChars.endsWith("```")) {
-                                // inserting closing backticks and language placeholder
                                 val beforeCursor = newValue.text.substring(0, newValue.selection.start)
                                 val afterCursor = newValue.text.substring(newValue.selection.start)
                                 val newText = "$beforeCursor\n`$afterCursor"
