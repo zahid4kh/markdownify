@@ -75,7 +75,7 @@ compose.desktop {
                 shortcut = true
                 dirChooser = true
                 menu = true
-                upgradeUuid = "run the 'generateUpgradeUuid' task and paste the generated UUID here only once"
+                upgradeUuid = "020432f7-f1a8-4c61-b5a8-bdc2e6a5d155"
                 iconFile.set(project.file("icons/windows.ico"))
             }
 
