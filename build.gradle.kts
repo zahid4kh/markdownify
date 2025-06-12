@@ -80,7 +80,7 @@ compose.desktop {
             }
 
             macOS{
-                dockName = "markdown renderer"
+                dockName = "Markdownify"
                 iconFile.set(project.file("icons/macos.icns"))
             }
         }
