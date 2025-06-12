@@ -95,6 +95,10 @@ fun parseMarkdown(input: String): List<MarkdownToken> {
             line.startsWith("|") && line.endsWith("|") -> {
                 i = parseTable(lines, i, tokens)
             }
+            line.trim() == "---" || line.trim() == "***" || line.trim() == "___" -> {
+                tokens.add(MarkdownToken.HorizontalRule)
+                i++
+            }
             else -> {
                 tokens.add(MarkdownToken.Paragraph(parseInline(line)))
                 i++

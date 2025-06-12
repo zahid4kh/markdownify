@@ -4,6 +4,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -372,6 +374,13 @@ fun RenderMarkdown(tokens: List<MarkdownToken>) {
                             )
                         }
                     }
+                }
+
+                is MarkdownToken.HorizontalRule -> {
+                    HorizontalDivider(
+                        thickness = 1.dp,
+                        color = (MaterialTheme.colorScheme.onSecondaryContainer)
+                    )
                 }
             }
         }

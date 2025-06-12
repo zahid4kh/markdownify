@@ -7,6 +7,7 @@ sealed class MarkdownToken {
     data class Banner(val type: BannerType, val inlines: List<InlineToken>) : MarkdownToken()
     data class Table(val headers: List<List<InlineToken>>, val rows: List<List<List<InlineToken>>>) : MarkdownToken()
     data class ClickableImage(val altText: String, val imageUrl: String, val linkUrl: String) : MarkdownToken()
+    object HorizontalRule : MarkdownToken()
 }
 
 enum class BannerType {
