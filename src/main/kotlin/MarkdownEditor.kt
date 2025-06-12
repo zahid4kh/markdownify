@@ -1,4 +1,5 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -44,7 +45,9 @@ fun MarkdownEditor(
 
     Column{
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.secondaryContainer),
             verticalAlignment = Alignment.CenterVertically
         ) {
             MenuBar(
@@ -171,8 +174,8 @@ fun MarkdownEditor(
                 textStyle = TextStyle(fontFamily = FontFamily.Monospace),
                 shape = RectangleShape,
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    unfocusedContainerColor = Color.LightGray,
+                    focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
                 )
             )
 
