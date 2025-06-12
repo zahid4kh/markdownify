@@ -176,18 +176,10 @@ fun MarkdownEditor(
                 )
             )
 
-//            Box(
-//                modifier = Modifier
-//                    .width(1.dp)
-//                    .fillMaxHeight()
-//                    .background(Color.LightGray)
-//            )
-
             Box(
                 modifier = Modifier
                     .weight(0.5f)
                     .fillMaxHeight()
-                //.padding(start = 8.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -233,7 +225,9 @@ fun MarkdownEditor(
         InfoDialog(
             title = "Markdown Renderer",
             content = {
-                Column {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                ) {
                     Text("Markdown Renderer v1.0.0")
                     Spacer(Modifier.height(8.dp))
                     Text("A powerful markdown editor built with Compose for Desktop")
