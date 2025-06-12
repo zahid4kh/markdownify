@@ -1,8 +1,10 @@
+import androidx.annotation.Keep
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import java.io.File
 
+@Keep
 class Database {
     private val json = Json {
         prettyPrint = true

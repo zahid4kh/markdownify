@@ -1,3 +1,4 @@
+import androidx.annotation.Keep
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -7,6 +8,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
+@Keep
 class MainViewModel(
     private val database: Database,
 ) {
@@ -168,6 +170,7 @@ class MainViewModel(
         _uiState.value = _uiState.value.copy(showInfo = false)
     }
 
+    @Keep
     data class UiState(
         val darkMode: Boolean = false,
         val openFiles: List<OpenFile> = emptyList(),
