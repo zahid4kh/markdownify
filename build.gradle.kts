@@ -114,7 +114,7 @@ compose.resources{
 val workDir = file("deb-temp")
 val packageName = "${compose.desktop.application.nativeDistributions.packageName}"
 val desktopRelativePath = "opt/$packageName/lib/$packageName-$packageName.desktop"
-val appDisplayName = "SumPDF"
+val appDisplayName = "Markdownify"
 val mainClass = "${compose.desktop.application.mainClass}"
 
 fun promptUserChoice(): String {
