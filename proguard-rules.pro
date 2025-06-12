@@ -1,5 +1,4 @@
 -dontwarn kotlinx.serialization.**
--keep class sumpdf.BuildConfig { *; }
 
 # OkHttp - Suppress warnings for Android, Conscrypt, and OpenJSSE specific classes
 -dontwarn okhttp3.internal.platform.**
@@ -77,18 +76,7 @@
 -keep class OpenFile { *; }
 -keep class Database { *; }
 -keep class MainViewModel { *; }
--keep class MainViewModel.UiState { *; }
 -keep class AppSettings$$serializer { *; }
-
-# Keep all local model classes and enums
--keep class combiner.PdfCombinerIntent { *; }
--keep class combiner.PdfCombinerIntent$* { *; }
--keep class combiner.PdfFile { *; }
--keep class combiner.PdfFile$* { *; }
--keep enum converter.ConversionStatus { *; }
--keep class model.FileItem { *; }
--keep class model.ConversionResult { *; }
--keep interface converter.Converter { *; }
 
 # XML and DOM - Handle duplicate definitions
 -dontnote javax.xml.**
@@ -331,14 +319,6 @@
 }
 -dontwarn com.google.gson.**
 -dontnote com.google.gson.**
-
-# PreCompose
--dontwarn moe.tlaster.precompose.**
--keep class moe.tlaster.precompose.** { *; }
--keep interface moe.tlaster.precompose.** { *; }
--keep class * extends moe.tlaster.precompose.viewmodel.ViewModel { *; }
--keepnames class * implements moe.tlaster.precompose.navigation.Route
--dontnote moe.tlaster.precompose.navigation.Route
 
 
 # Keep reflection access needed by your app
