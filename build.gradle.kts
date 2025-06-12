@@ -58,13 +58,19 @@ compose.desktop {
         mainClass = "markdownrenderer"
 
         nativeDistributions {
+            jvmArgs += listOf(
+                "-Dfile.encoding=UTF-8"
+            )
+
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
             packageName = "markdownify"
             packageVersion = "1.0.0"
 
-            buildTypes.release.proguard{
-                obfuscate = true
-                optimize = true
+            buildTypes.release.proguard {
+                configurationFiles.from("proguard-rules.pro")
+                isEnabled = true
+                obfuscate = false
+                optimize = false
             }
 
             linux{
