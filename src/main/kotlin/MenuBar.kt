@@ -71,7 +71,7 @@ fun MenuBarItem(
             onClick = { expanded = !expanded },
             shape = MaterialTheme.shapes.medium,
             colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = MaterialTheme.colorScheme.primary
+                contentColor = MaterialTheme.colorScheme.onSurface
             ),
             modifier = Modifier.pointerHoverIcon(icon = PointerIcon.Hand)
         ) {

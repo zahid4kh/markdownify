@@ -5,9 +5,12 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.*
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 
@@ -43,7 +46,9 @@ fun TabDropdown(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.widthIn(min = 200.dp, max = 400.dp)
+            modifier = Modifier.widthIn(min = 200.dp, max = 400.dp),
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            shape = MaterialTheme.shapes.medium
         ) {
             openFiles.forEachIndexed { index, file ->
                 DropdownMenuItem(
@@ -89,6 +94,7 @@ fun TabDropdown(
                                 MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
                             else Color.Transparent
                         )
+                        .pointerHoverIcon(icon = PointerIcon.Hand)
                 )
             }
         }
