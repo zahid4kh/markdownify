@@ -58,7 +58,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
-            packageName = "markdownrenderer"
+            packageName = "markdownify"
             packageVersion = "1.0.0"
 
             buildTypes.release.proguard{
