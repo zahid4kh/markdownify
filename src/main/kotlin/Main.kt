@@ -27,7 +27,7 @@ fun main() {
         Window(
             onCloseRequest = ::exitApplication,
             state = windowState,
-            title = "Markdown Renderer - ${uiState.activeFile?.displayTitle ?: "No file"}"
+            title = "Markdownify - ${uiState.activeFile?.displayTitle ?: "No file"}"
         ) {
             window.minimumSize = Dimension(800, 600)
 
