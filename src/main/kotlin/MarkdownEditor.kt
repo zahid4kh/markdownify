@@ -120,6 +120,7 @@ fun MarkdownEditor(
                 modifier = Modifier
                     .weight(0.5f)
                     .fillMaxHeight()
+                    .verticalScroll(scrollState)
                     .onPreviewKeyEvent { event ->
                         if (event.type == KeyEventType.KeyDown) {
                             when (event.key) {
