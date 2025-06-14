@@ -368,3 +368,8 @@
 # Keep service loading related annotations
 -keepattributes RuntimeVisibleAnnotations
 -keepattributes RuntimeInvisibleAnnotations
+
+# Keep Semver4j library
+-keep class com.vdurmont.semver4j.** { *; }
+-keep interface com.vdurmont.semver4j.** { *; }
+-dontnote com.vdurmont.semver4j.**
