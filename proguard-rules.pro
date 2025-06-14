@@ -325,3 +325,46 @@
 -keepclassmembers class * {
     @com.sun.star.lib.uno.typeinfo.TypeInfo <fields>;
 }
+
+# Coil3 Image Loading Library
+-keep class coil3.** { *; }
+-keep interface coil3.** { *; }
+-dontwarn coil3.**
+-dontnote coil3.**
+
+# Keep Coil3 Service Loaders - Critical for network fetchers
+-keep class coil3.util.** { *; }
+-keep class coil3.network.** { *; }
+-keep class coil3.network.okhttp.** { *; }
+-keep class coil3.network.okhttp.internal.** { *; }
+
+# Specifically keep the missing OkHttp network fetcher
+-keep class coil3.network.okhttp.internal.OkHttpNetworkFetcherServiceLoaderTarget { *; }
+-keep class coil3.network.okhttp.internal.OkHttpNetworkFetcher { *; }
+
+# Keep all Coil3 service loader targets
+-keep class * implements coil3.util.FetcherServiceLoaderTarget { *; }
+-keep class * implements coil3.util.DecoderServiceLoaderTarget { *; }
+-keep class * implements coil3.util.ServiceLoaderTarget { *; }
+
+# Preserve service loader configuration files
+-keepclassmembers class * {
+    @coil3.annotation.ExperimentalCoilApi *;
+}
+
+# Keep META-INF service files that service loaders read
+-keepclasseswithmembers class * {
+    public static ** INSTANCE;
+}
+
+# Additional OkHttp classes that Coil3 might need
+-keep class okhttp3.internal.** { *; }
+-keep class okio.internal.** { *; }
+
+# Service loader mechanism preservation
+-keep class * extends java.util.ServiceLoader { *; }
+-keep class * implements java.util.ServiceLoader$Provider { *; }
+
+# Keep service loading related annotations
+-keepattributes RuntimeVisibleAnnotations
+-keepattributes RuntimeInvisibleAnnotations
