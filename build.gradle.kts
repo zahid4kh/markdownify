@@ -119,6 +119,39 @@ compose.resources{
     generateResClass = auto
 }
 
+tasks.register("generateBuildConfig") {
+    group = "build"
+    description = "Generates BuildConfig.kt with project version"
+
+    doLast {
+        val buildConfigDir = file("src/main/kotlin/markdownify")
+        buildConfigDir.mkdirs()
+
+        val buildConfigFile = file("$buildConfigDir/BuildConfig.kt")
+        val projectVersion = project.version.toString()
+
+        buildConfigFile.writeText("""
+            package markdownify
+            
+            object BuildConfig {
+                const val VERSION_NAME = "$projectVersion"
+            }
+        """.trimIndent())
+
+        println("Generated BuildConfig.kt with VERSION_NAME = $projectVersion")
+    }
+}
+
+tasks.named("compileKotlin") {
+    dependsOn("generateBuildConfig")
+}
+
+tasks.named("generateBuildConfig") {
+    inputs.property("version", project.version)
+    outputs.file(file("src/main/kotlin/markdownify/BuildConfig.kt"))
+}
+
+
 // only for LinuxOS
 val workDir = file("deb-temp")
 val packageName = "${compose.desktop.application.nativeDistributions.packageName}"
