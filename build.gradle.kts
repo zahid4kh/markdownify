@@ -75,6 +75,7 @@ compose.desktop {
 
             linux{
                 shortcut = true
+                debMaintainer = "Zahid Khalilov <halilzahid@gmail.com>"
                 iconFile.set(project.file("icons/linuxos.png"))
             }
 
@@ -121,6 +122,8 @@ val workDir = file("deb-temp")
 val packageName = "${compose.desktop.application.nativeDistributions.packageName}"
 val desktopRelativePath = "opt/$packageName/lib/$packageName-$packageName.desktop"
 val appDisplayName = "Markdownify"
+val maintainer = "Zahid Khalilov <halilzahid@gmail.com>"
+val controlDescription = "A powerful desktop markdown editor with live preview"
 val mainClass = "${compose.desktop.application.mainClass}"
 
 fun promptUserChoice(): String {
@@ -138,7 +141,7 @@ fun promptUserChoice(): String {
 
 tasks.register("addStartupWMClassToDebDynamic") {
     group = "release"
-    description = "Finds .deb file, modifies .desktop with Name and StartupWMClass, and rebuilds it"
+    description = "Finds .deb file, modifies .desktop and control files, and rebuilds it"
 
     doLast {
         val debRoot = file("build/compose/binaries")
@@ -211,13 +214,52 @@ tasks.register("addStartupWMClassToDebDynamic") {
         desktopFile.readLines().forEach { println(it) }
         println("--------------------------------\n")
 
+        // Step 3: Modifying the DEBIAN/control file
+        val controlFile = File(workDir, "DEBIAN/control")
+        if (!controlFile.exists()) throw GradleException("❌ control file not found: DEBIAN/control")
 
-        // Step 3: Repackaging the debian package back
+        val controlLines = controlFile.readLines().toMutableList()
+
+        // Update maintainer field
+        var maintainerModified = false
+        for (i in controlLines.indices) {
+            if (controlLines[i].trim().startsWith("Maintainer:")) {
+                controlLines[i] = "Maintainer: $maintainer"
+                maintainerModified = true
+                println("✅ Modified Maintainer entry")
+                break
+            }
+        }
+
+        // Add maintainer field if it doesn't exist
+        if (!maintainerModified) {
+            controlLines.add("Maintainer: $maintainer")
+            println("✅ Added Maintainer entry")
+        }
+
+        // Update description field for better info
+        for (i in controlLines.indices) {
+            if (controlLines[i].trim().startsWith("Description:")) {
+                controlLines[i] = "Description: $controlDescription"
+                println("✅ Modified Description entry")
+                break
+            }
+        }
+
+        // Write changes back to control file
+        controlFile.writeText(controlLines.joinToString("\n"))
+
+        println("\n📄 Final control file content:")
+        println("--------------------------------")
+        controlFile.readLines().forEach { println(it) }
+        println("--------------------------------\n")
+
+        // Step 4: Repackaging the debian package back
         exec {
             commandLine("dpkg-deb", "-b", workDir.absolutePath, modifiedDeb.absolutePath)
         }
 
-        println("✅ Done: Rebuilt with Name=$appDisplayName and StartupWMClass=$mainClass -> ${modifiedDeb.name}")
+        println("✅ Done: Rebuilt with Name=$appDisplayName, StartupWMClass=$mainClass, and updated control file -> ${modifiedDeb.name}")
     }
 }
 
