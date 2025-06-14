@@ -6,3 +6,5 @@
 /wiki
 /deb-temp
 /src/main/kotlin/markdownify/
+/docs/node_modules
+/docs/.next
