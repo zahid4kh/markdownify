@@ -1,8 +1,11 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -13,14 +16,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import deskit.dialogs.InfoDialog
 import deskit.dialogs.file.FileChooserDialog
 import deskit.dialogs.file.FileSaverDialog
+import markdownify.BuildConfig
+import sun.font.FontUtilities.isLinux
+import sun.font.FontUtilities.isWindows
+import java.awt.Desktop
+import java.net.URI
 
 @Preview
 @Composable
@@ -35,6 +46,9 @@ fun MarkdownEditor(
     }
     val tokens = parseMarkdown(textFieldValue.text) // not using remember to avoid caching the links
     val scrollState = rememberScrollState()
+
+    val isWindows = System.getProperty("os.name").lowercase().contains("windows")
+    val isLinux = System.getProperty("os.name").lowercase().contains("linux")
 
     LaunchedEffect(uiState.activeFileIndex) {
         if (activeFile != null) {
@@ -227,20 +241,98 @@ fun MarkdownEditor(
 
     if (uiState.showInfo) {
         InfoDialog(
-            title = "Markdown Renderer",
+            width = 450.dp,
+            height = if (uiState.isCheckingUpdates || uiState.updateMessage != null) 400.dp else 530.dp,
+            title = "Markdownify",
             content = {
                 Column(
-                    modifier = Modifier.verticalScroll(rememberScrollState())
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text("Markdown Renderer v1.0.0")
-                    Spacer(Modifier.height(8.dp))
-                    Text("A powerful markdown editor built with Compose for Desktop")
-                    Spacer(Modifier.height(8.dp))
-                    Text("Features:")
-                    Text("• Live markdown preview")
-                    Text("• Multiple file tabs")
-                    Text("• Dark/Light theme")
-                    Text("• File operations")
+                    if (uiState.isCheckingUpdates) {
+                        LinearProgressIndicator(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "Checking for updates...",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    } else if (uiState.updateMessage != null) {
+                        Text(
+                            text = uiState.updateMessage ?: "No update information available.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
+                        )
+                        if (uiState.isUpdateAvailable) {
+                            val downloadUrl = "https://mdownify.vercel.app"
+                            if (isWindows) {
+                                Text(
+                                    text = "Download the latest .exe or .msi installer from:",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = downloadUrl,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier
+                                        .clickable {
+                                            Desktop.getDesktop().browse(URI(downloadUrl))
+                                        }
+                                        .pointerHoverIcon(icon = PointerIcon.Hand)
+                                )
+                            } else if (isLinux) {
+                                Text(
+                                    text = "Download and install the latest Debian package from:",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    textAlign = TextAlign.Center
+                                )
+                                Text(
+                                    text = downloadUrl,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier
+                                        .clickable {
+                                            Desktop.getDesktop().browse(URI(downloadUrl))
+                                        }
+                                        .pointerHoverIcon(icon = PointerIcon.Hand)
+                                )
+                            }
+                        }
+
+                        Spacer(Modifier.height(8.dp))
+                        Button(
+                            onClick = { viewModel.checkForUpdates() }
+                        ) {
+                            Text("Check again")
+                        }
+                    } else {
+                        Text("Markdownify ${BuildConfig.VERSION_NAME}")
+                        Spacer(Modifier.height(8.dp))
+                        Text("A powerful markdown editor built with ❤️")
+                        Spacer(Modifier.height(8.dp))
+                        Text("Features:")
+                        Text("• Live markdown preview")
+                        Text("• Multiple file tabs")
+                        Text("• Dark/Light theme")
+                        Text("• File operations")
+                        Spacer(Modifier.height(8.dp))
+
+                        Button(
+                            onClick = { viewModel.checkForUpdates() }
+                        ) {
+                            Text("Check for updates")
+                        }
+                    }
                 }
             },
             onClose = { viewModel.hideInfo() }
