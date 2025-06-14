@@ -5,21 +5,23 @@ fun parseMarkdown(input: String): List<MarkdownToken> {
 
     while (i < lines.size) {
         val line = lines[i]
+        val trimmedLine = line.trim()
+
         when {
-            line.startsWith("#### ") -> {
-                tokens.add(MarkdownToken.Heading(4, line.drop(5)))
+            trimmedLine.startsWith("#### ") -> {
+                tokens.add(MarkdownToken.Heading(4, trimmedLine.drop(5)))
                 i++
             }
-            line.startsWith("### ") -> {
-                tokens.add(MarkdownToken.Heading(3, line.drop(4)))
+            trimmedLine.startsWith("### ") -> {
+                tokens.add(MarkdownToken.Heading(3, trimmedLine.drop(4)))
                 i++
             }
-            line.startsWith("## ") -> {
-                tokens.add(MarkdownToken.Heading(2, line.drop(3)))
+            trimmedLine.startsWith("## ") -> {
+                tokens.add(MarkdownToken.Heading(2, trimmedLine.drop(3)))
                 i++
             }
-            line.startsWith("# ") -> {
-                tokens.add(MarkdownToken.Heading(1, line.drop(2)))
+            trimmedLine.startsWith("# ") -> {
+                tokens.add(MarkdownToken.Heading(1, trimmedLine.drop(2)))
                 i++
             }
             isBulletLine(line) -> {
@@ -27,8 +29,8 @@ fun parseMarkdown(input: String): List<MarkdownToken> {
                 tokens.add(MarkdownToken.Bullet(level, parseInline(content)))
                 i++
             }
-            line.startsWith("```") -> {
-                val hasClosingBackticks = lines.subList(i + 1, lines.size).any { it.trim() == "```" }
+            trimmedLine.startsWith("```") -> {
+                val hasClosingBackticks = lines.subList(i + 1, lines.size).any { it.trim().startsWith("```") }
                 if (hasClosingBackticks) {
                     i = parseCodeBlock(lines, i, tokens)
                 } else {
@@ -36,40 +38,40 @@ fun parseMarkdown(input: String): List<MarkdownToken> {
                     i++
                 }
             }
-            line.startsWith("!!! ") -> {
-                tokens.add(MarkdownToken.Banner(BannerType.INFO, parseInline(line.drop(4))))
+            trimmedLine.startsWith("!!! ") -> {
+                tokens.add(MarkdownToken.Banner(BannerType.INFO, parseInline(trimmedLine.drop(4))))
                 i++
             }
-            line.startsWith("!!! warning ") -> {
-                tokens.add(MarkdownToken.Banner(BannerType.WARNING, parseInline(line.drop(12))))
+            trimmedLine.startsWith("!!! warning ") -> {
+                tokens.add(MarkdownToken.Banner(BannerType.WARNING, parseInline(trimmedLine.drop(12))))
                 i++
             }
-            line.startsWith("!!! error ") -> {
-                tokens.add(MarkdownToken.Banner(BannerType.ERROR, parseInline(line.drop(10))))
+            trimmedLine.startsWith("!!! error ") -> {
+                tokens.add(MarkdownToken.Banner(BannerType.ERROR, parseInline(trimmedLine.drop(10))))
                 i++
             }
-            line.startsWith("!!! success ") -> {
-                tokens.add(MarkdownToken.Banner(BannerType.SUCCESS, parseInline(line.drop(12))))
+            trimmedLine.startsWith("!!! success ") -> {
+                tokens.add(MarkdownToken.Banner(BannerType.SUCCESS, parseInline(trimmedLine.drop(12))))
                 i++
             }
-            line.startsWith("> Note:") -> {
-                tokens.add(MarkdownToken.Banner(BannerType.NOTE, parseInline(line.drop(2))))
+            trimmedLine.startsWith("> Note:") -> {
+                tokens.add(MarkdownToken.Banner(BannerType.NOTE, parseInline(trimmedLine.drop(2))))
                 i++
             }
-            line.startsWith("!!! note ") -> {
-                tokens.add(MarkdownToken.Banner(BannerType.NOTE, parseInline(line.drop(9))))
+            trimmedLine.startsWith("!!! note ") -> {
+                tokens.add(MarkdownToken.Banner(BannerType.NOTE, parseInline(trimmedLine.drop(9))))
                 i++
             }
-            line.startsWith("[![") -> {
-                val imgCloseBracket = line.indexOf("](", 3)
+            trimmedLine.startsWith("[![") -> {
+                val imgCloseBracket = trimmedLine.indexOf("](", 3)
                 if (imgCloseBracket != -1) {
-                    val imgCloseParen = line.indexOf(")", imgCloseBracket + 2)
-                    if (imgCloseParen != -1 && line.startsWith("](", imgCloseParen + 1)) {
-                        val linkCloseParen = line.indexOf(")", imgCloseParen + 3)
+                    val imgCloseParen = trimmedLine.indexOf(")", imgCloseBracket + 2)
+                    if (imgCloseParen != -1 && trimmedLine.startsWith("](", imgCloseParen + 1)) {
+                        val linkCloseParen = trimmedLine.indexOf(")", imgCloseParen + 3)
                         if (linkCloseParen != -1) {
-                            val altText = line.substring(3, imgCloseBracket)
-                            val imageUrl = line.substring(imgCloseBracket + 2, imgCloseParen)
-                            val linkUrl = line.substring(imgCloseParen + 3, linkCloseParen)
+                            val altText = trimmedLine.substring(3, imgCloseBracket)
+                            val imageUrl = trimmedLine.substring(imgCloseBracket + 2, imgCloseParen)
+                            val linkUrl = trimmedLine.substring(imgCloseParen + 3, linkCloseParen)
                             tokens.add(MarkdownToken.ClickableImage(altText, imageUrl, linkUrl))
                             i++
                             continue
@@ -79,13 +81,13 @@ fun parseMarkdown(input: String): List<MarkdownToken> {
                 tokens.add(MarkdownToken.Paragraph(parseInline(line)))
                 i++
             }
-            line.startsWith("![") -> {
-                val closeBracket = line.indexOf(']', 2)
-                if (closeBracket != -1 && line.getOrNull(closeBracket + 1) == '(' && line.indexOf(')', closeBracket) != -1) {
-                    val altText = line.substring(2, closeBracket)
+            trimmedLine.startsWith("![") -> {
+                val closeBracket = trimmedLine.indexOf(']', 2)
+                if (closeBracket != -1 && trimmedLine.getOrNull(closeBracket + 1) == '(' && trimmedLine.indexOf(')', closeBracket) != -1) {
+                    val altText = trimmedLine.substring(2, closeBracket)
                     val urlStart = closeBracket + 2
-                    val urlEnd = line.indexOf(')', urlStart)
-                    val url = line.substring(urlStart, urlEnd)
+                    val urlEnd = trimmedLine.indexOf(')', urlStart)
+                    val url = trimmedLine.substring(urlStart, urlEnd)
                     tokens.add(MarkdownToken.Image(altText, url))
                 } else {
                     tokens.add(MarkdownToken.Paragraph(parseInline(line)))
@@ -95,7 +97,7 @@ fun parseMarkdown(input: String): List<MarkdownToken> {
             line.startsWith("|") && line.endsWith("|") -> {
                 i = parseTable(lines, i, tokens)
             }
-            line.trim() == "---" || line.trim() == "***" || line.trim() == "___" -> {
+            trimmedLine == "---" || trimmedLine == "***" || trimmedLine == "___" -> {
                 tokens.add(MarkdownToken.HorizontalRule)
                 i++
             }
@@ -130,13 +132,23 @@ fun parseBulletLine(line: String): Pair<Int, String> {
 
 fun parseCodeBlock(lines: List<String>, startIndex: Int, tokens: MutableList<MarkdownToken>): Int {
     val firstLine = lines[startIndex]
-    val language = firstLine.drop(3).trim()
+    val trimmedFirstLine = firstLine.trim()
+    val language = trimmedFirstLine.drop(3).trim()
+
+    val indentationLength = firstLine.length - firstLine.trimStart().length
 
     val codeLines = mutableListOf<String>()
     var i = startIndex + 1
 
-    while (i < lines.size && !lines[i].startsWith("```")) {
-        codeLines.add(lines[i])
+    while (i < lines.size && !lines[i].trim().startsWith("```")) {
+        val currentLine = lines[i]
+        val processedLine = if (currentLine.length > indentationLength &&
+            currentLine.substring(0, indentationLength).all { it == ' ' || it == '\t' }) {
+            currentLine.substring(indentationLength)
+        } else {
+            currentLine
+        }
+        codeLines.add(processedLine)
         i++
     }
 
