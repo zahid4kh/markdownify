@@ -2,9 +2,67 @@
 
 A desktop markdown editor with live preview, built with Compose for Desktop.
 
-![Markdownify Screenshot](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)
-![Kotlin](https://img.shields.io/badge/Kotlin-2.1.20-blue)
-![Compose](https://img.shields.io/badge/Compose-Desktop-green)
+![Platforms](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-blue)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.1.20-blue.png?logo=kotlin)](https://kotlinlang.org)
+[![Compose](https://img.shields.io/badge/Compose-1.8.0-blue.png?logo=jetpack-compose)](https://www.jetbrains.com/lp/compose-multiplatform/)
+
+## 🚀 Installation
+
+### Linux Installation (Recommended)
+
+**Easy installation via APT repository:**
+
+📦 **[Install from my APT Repository](https://github.com/zahid4kh/my-apt-repo)**
+
+This is the recommended method for Ubuntu/Debian users as it provides automatic updates and dependency management.
+
+### Download Releases
+
+1. Go to [Releases](https://github.com/zahid4kh/markdownify/releases)
+2. Download the appropriate installer:
+
+- **Windows**: `.exe` or `.msi` installer
+- **Linux**: `.deb` package (manual installation)
+
+### Manual Linux Installation
+
+```bash
+sudo dpkg -i markdownify_1.0.0-1_amd64-wm.deb
+
+sudo apt install -f
+```
+
+### Windows Installation
+
+- Run the `.exe` installer and follow the setup wizard
+- Administrator privileges may be required
+
+## 🔧 Build from Source
+
+### Prerequisites
+
+- **JDK 17+**
+- **Gradle 8.0+**
+
+### Build Steps
+
+```bash
+# Clone the repository
+git clone https://github.com/zahid4kh/markdownify.git
+cd markdownify
+
+# Run the application
+./gradlew :run
+
+# Or run with hot-reload for development
+./gradlew :runHot --mainClass markdownrenderer --auto
+
+# Create distribution packages
+./gradlew packageDeb          # Linux .deb
+./gradlew packageMsi          # Windows .msi
+./gradlew packageExe          # Windows .exe
+./gradlew packageDmg          # macOS .dmg
+```
 
 ## ✨ Features
 
@@ -26,16 +84,6 @@ A desktop markdown editor with live preview, built with Compose for Desktop.
 - **File Operations** - Create, open, save markdown files with native file dialogs
 - **Clickable Links** - Click links in preview to open in browser with hover tooltips
 - **Cross-Platform** - Native installers for Windows (.msi/.exe) and Linux (.deb)
-
-## 🚀 Getting Started
-
-must fill this up
-
-### Building From Source
-Build for your current platform:
-```bash
-./gradlew packageDistributionForCurrentOS
-```
 
 ## 🎯 Usage
 
