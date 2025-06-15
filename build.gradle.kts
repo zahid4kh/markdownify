@@ -11,9 +11,10 @@ plugins {
     alias(libs.plugins.kotlin.plugin.serialization)
     alias(libs.plugins.hotReload)
 }
+val appPackageVersion = "1.0.1"
 
 group = "zahid4kh.markdownrenderer"
-version = "1.0.0"
+version = appPackageVersion
 
 repositories {
     maven { url = uri("https://jitpack.io") }
@@ -66,7 +67,7 @@ compose.desktop {
 
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
             packageName = "markdownify"
-            packageVersion = "1.0.0"
+            packageVersion = appPackageVersion
 
             buildTypes.release.proguard {
                 configurationFiles.from("proguard-rules.pro")
@@ -176,7 +177,7 @@ fun promptUserChoice(): String {
 
 tasks.register("addStartupWMClassToDebDynamic") {
     group = "release"
-    description = "Finds .deb file, modifies .desktop and control files, and rebuilds it"
+    description = "Finds .deb file, modifies .desktop, control files, and DEBIAN scripts, and rebuilds it"
 
     doLast {
         val debRoot = file("build/compose/binaries")
@@ -289,12 +290,127 @@ tasks.register("addStartupWMClassToDebDynamic") {
         controlFile.readLines().forEach { println(it) }
         println("--------------------------------\n")
 
-        // Step 4: Repackaging the debian package back
+        // Step 4: Modifying the DEBIAN/postinst script
+        val postinstFile = File(workDir, "DEBIAN/postinst")
+        if (!postinstFile.exists()) throw GradleException("❌ postinst file not found: DEBIAN/postinst")
+
+        val postinstContent = """#!/bin/sh
+# postinst script for $packageName
+#
+# see: dh_installdeb(1)
+
+set -e
+
+# summary of how this script can be called:
+#        * <postinst> `configure' <most-recently-configured-version>
+#        * <old-postinst> `abort-upgrade' <new version>
+#        * <conflictor's-postinst> `abort-remove' `in-favour' <package>
+#          <new-version>
+#        * <postinst> `abort-remove'
+#        * <deconfigured's-postinst> `abort-deconfigure' `in-favour'
+#          <failed-install-package> <version> `removing'
+#          <conflicting-package> <version>
+# for details, see https://www.debian.org/doc/debian-policy/ or
+# the debian-policy package
+
+case "${"$"}1" in
+    configure)
+        # Install desktop menu entry
+        xdg-desktop-menu install /opt/$packageName/lib/$packageName-$packageName.desktop
+        
+        # Create symlink for terminal access
+        if [ ! -L /usr/local/bin/$packageName ]; then
+            ln -sf /opt/$packageName/bin/$packageName /usr/local/bin/$packageName
+            echo "Created symlink: /usr/local/bin/$packageName -> /opt/$packageName/bin/$packageName"
+        fi
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`${"$"}1'" >&2
+        exit 1
+    ;;
+esac
+
+exit 0"""
+
+        postinstFile.writeText(postinstContent)
+        println("✅ Updated postinst script to create terminal symlink")
+
+        // Step 5: Modifying the DEBIAN/prerm script
+        val prermFile = File(workDir, "DEBIAN/prerm")
+        if (!prermFile.exists()) throw GradleException("❌ prerm file not found: DEBIAN/prerm")
+
+        val prermContent = """#!/bin/sh
+# prerm script for $packageName
+#
+# see: dh_installdeb(1)
+
+set -e
+
+# summary of how this script can be called:
+#        * <prerm> `remove'
+#        * <old-prerm> `upgrade' <new-version>
+#        * <new-prerm> `failed-upgrade' <old-version>
+#        * <conflictor's-prerm> `remove' `in-favour' <package> <new-version>
+#        * <deconfigured's-prerm> `deconfigure' `in-favour'
+#          <package-being-installed> <version> `removing'
+#          <conflicting-package> <version>
+# for details, see https://www.debian.org/doc/debian-policy/ or
+# the debian-policy package
+
+case "${"$"}1" in
+    remove|upgrade|deconfigure)
+        # Remove desktop menu entry
+        xdg-desktop-menu uninstall /opt/$packageName/lib/$packageName-$packageName.desktop
+        
+        # Remove terminal symlink
+        if [ -L /usr/local/bin/$packageName ]; then
+            rm -f /usr/local/bin/$packageName
+            echo "Removed symlink: /usr/local/bin/$packageName"
+        fi
+    ;;
+
+    failed-upgrade)
+    ;;
+
+    *)
+        echo "prerm called with unknown argument \`${"$"}1'" >&2
+        exit 1
+    ;;
+esac
+
+exit 0"""
+
+        prermFile.writeText(prermContent)
+        println("✅ Updated prerm script to remove terminal symlink")
+
+        // Make sure scripts are executable
+        exec {
+            commandLine("chmod", "+x", postinstFile.absolutePath)
+        }
+        exec {
+            commandLine("chmod", "+x", prermFile.absolutePath)
+        }
+
+        println("\n📄 Final postinst script content:")
+        println("--------------------------------")
+        postinstFile.readLines().forEach { println(it) }
+        println("--------------------------------\n")
+
+        println("\n📄 Final prerm script content:")
+        println("--------------------------------")
+        prermFile.readLines().forEach { println(it) }
+        println("--------------------------------\n")
+
+        // Step 6: Repackaging the debian package back
         exec {
             commandLine("dpkg-deb", "-b", workDir.absolutePath, modifiedDeb.absolutePath)
         }
 
-        println("✅ Done: Rebuilt with Name=$appDisplayName, StartupWMClass=$mainClass, and updated control file -> ${modifiedDeb.name}")
+        println("✅ Done: Rebuilt with Name=$appDisplayName, StartupWMClass=$mainClass, updated control file, and terminal symlink -> ${modifiedDeb.name}")
     }
 }
 
