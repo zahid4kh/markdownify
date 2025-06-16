@@ -6,6 +6,8 @@ A desktop markdown editor with live preview, built with Compose for Desktop.
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.1.20-blue.png?logo=kotlin)](https://kotlinlang.org)
 [![Compose](https://img.shields.io/badge/Compose-1.8.0-blue.png?logo=jetpack-compose)](https://www.jetbrains.com/lp/compose-multiplatform/)
 
+![Markdownify](screenshots/mdownify.png)
+
 ## 🚀 Installation
 
 ### Linux Installation (Recommended)
