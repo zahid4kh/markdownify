@@ -4,16 +4,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -24,12 +18,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import deskit.dialogs.InfoDialog
-import deskit.dialogs.file.FileChooserDialog
-import deskit.dialogs.file.FileSaverDialog
+import deskit.dialogs.file.filechooser.FileChooserDialog
+import deskit.dialogs.file.filesaver.FileSaverDialog
+import deskit.dialogs.info.InfoDialog
 import markdownify.BuildConfig
-import sun.font.FontUtilities.isLinux
-import sun.font.FontUtilities.isWindows
 import java.awt.Desktop
 import java.net.URI
 
