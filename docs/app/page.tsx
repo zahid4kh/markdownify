@@ -30,7 +30,7 @@ export default function MarkdownifyWebsite() {
   const [linuxInstallType, setLinuxInstallType] = useState<"apt" | "manual">(
     "apt"
   );
-  const APP_VERSION = "1.0.0";
+  const APP_VERSION = "1.0.2";
   const GITHUB_RELEASE_URL =
     "https://github.com/zahid4kh/markdownify/releases/download/" + APP_VERSION;
 
