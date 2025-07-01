@@ -11,7 +11,7 @@ plugins {
     alias(libs.plugins.kotlin.plugin.serialization)
     alias(libs.plugins.hotReload)
 }
-val appPackageVersion = "1.0.1"
+val appPackageVersion = "1.0.2"
 
 group = "zahid4kh.markdownrenderer"
 version = appPackageVersion
@@ -72,8 +72,8 @@ compose.desktop {
             buildTypes.release.proguard {
                 configurationFiles.from("proguard-rules.pro")
                 isEnabled = true
-                obfuscate = false
-                optimize = false
+                obfuscate = true
+                optimize = true
             }
 
             linux{
@@ -181,10 +181,10 @@ tasks.register("addStartupWMClassToDebDynamic") {
 
     doLast {
         val debRoot = file("build/compose/binaries")
-        if (!debRoot.exists()) throw GradleException("❌ Folder not found: ${debRoot}")
+        if (!debRoot.exists()) throw GradleException("❌ Folder not found: $debRoot")
 
         val allDebs = debRoot.walkTopDown().filter { it.isFile && it.extension == "deb" }.toList()
-        if (allDebs.isEmpty()) throw GradleException("❌ No .deb files found under ${debRoot}")
+        if (allDebs.isEmpty()) throw GradleException("❌ No .deb files found under $debRoot")
 
         // picking the latest .deb file
         val originalDeb = allDebs.maxByOrNull { it.lastModified() }!!
@@ -203,7 +203,7 @@ tasks.register("addStartupWMClassToDebDynamic") {
 
         // Step 2: Modifying the desktop entry file
         val desktopFile = File(workDir, desktopRelativePath)
-        if (!desktopFile.exists()) throw GradleException("❌ .desktop file not found: ${desktopRelativePath}")
+        if (!desktopFile.exists()) throw GradleException("❌ .desktop file not found: $desktopRelativePath")
 
         val lines = desktopFile.readLines().toMutableList()
 
@@ -313,7 +313,7 @@ set -e
 # for details, see https://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
-case "${"$"}1" in
+case "$1" in
     configure)
         # Install desktop menu entry
         xdg-desktop-menu install /opt/$packageName/lib/$packageName-$packageName.desktop
@@ -329,7 +329,7 @@ case "${"$"}1" in
     ;;
 
     *)
-        echo "postinst called with unknown argument \`${"$"}1'" >&2
+        echo "postinst called with unknown argument `$1`" >&2
         exit 1
     ;;
 esac
@@ -361,7 +361,7 @@ set -e
 # for details, see https://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
-case "${"$"}1" in
+case "$1" in
     remove|upgrade|deconfigure)
         # Remove desktop menu entry
         xdg-desktop-menu uninstall /opt/$packageName/lib/$packageName-$packageName.desktop
@@ -377,7 +377,7 @@ case "${"$"}1" in
     ;;
 
     *)
-        echo "prerm called with unknown argument \`${"$"}1'" >&2
+        echo "prerm called with unknown argument `$1`" >&2
         exit 1
     ;;
 esac

@@ -29,7 +29,7 @@ This is the recommended method for Ubuntu/Debian users as it provides automatic 
 ### Manual Linux Installation
 
 ```bash
-sudo dpkg -i markdownify_1.0.0-1_amd64-wm.deb
+sudo dpkg -i markdownify_1.0.2-1_amd64-wm.deb
 
 sudo apt install -f
 ```
